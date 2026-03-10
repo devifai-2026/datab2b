@@ -4,130 +4,204 @@
  */
 
 import { Link } from 'react-router-dom';
-import { Database, Mail, Lock, User, ArrowRight } from 'lucide-react';
 import { motion } from 'motion/react';
+import { MdEmail, MdLock, MdPerson, MdArrowForward, MdDataset, MdShield, MdPhone } from 'react-icons/md';
+import { FaGoogle, FaCheckCircle, FaRocket } from 'react-icons/fa';
+import { HiSparkles } from 'react-icons/hi2';
 
 export default function RegisterPage() {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-slate-50 px-4 py-12 sm:px-6 lg:px-8">
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="w-full max-w-md space-y-8"
-      >
-        <div className="text-center">
-          <Link to="/" className="inline-flex items-center gap-2">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-600 text-white">
-              <Database size={24} />
+    <div className="relative flex min-h-screen overflow-hidden" style={{ background: 'linear-gradient(135deg, #fff7ed 0%, #fff3e0 50%, #fef9f0 100%)' }}>
+
+      {/* Decorative blobs */}
+      <div className="absolute top-0 right-0 w-96 h-96 bg-orange-200/30 rounded-full blur-3xl translate-x-1/2 -translate-y-1/2 pointer-events-none" />
+      <div className="absolute bottom-0 left-0 w-80 h-80 bg-amber-200/20 rounded-full blur-3xl -translate-x-1/2 translate-y-1/2 pointer-events-none" />
+
+      {/* Right panel — branding (desktop only, placed last = right side) */}
+      <div className="hidden lg:flex lg:w-1/2 order-last flex-col justify-between relative overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-br from-amber-500 via-orange-500 to-rose-500" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(255,255,255,0.15)_0%,transparent_60%)]" />
+        <div className="absolute top-10 left-10 w-56 h-56 bg-white/10 rounded-full blur-3xl" />
+        <div className="absolute bottom-10 right-10 w-48 h-48 bg-yellow-300/10 rounded-full blur-3xl" />
+
+        <div className="relative z-10 p-10 flex-1 flex flex-col justify-center">
+          <Link to="/" className="inline-flex items-center gap-2.5 mb-14">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-white/20 border border-white/30 text-white">
+              <MdDataset size={22} />
             </div>
-            <span className="text-2xl font-bold tracking-tight text-slate-900">DataB2B</span>
+            <span className="text-2xl font-extrabold tracking-tight text-white" style={{ fontFamily: 'Outfit, sans-serif' }}>
+              data<span style={{ color: '#fef08a' }}>.b2b</span>
+            </span>
           </Link>
-          <h2 className="mt-6 text-3xl font-extrabold text-slate-900">Create your account</h2>
-          <p className="mt-2 text-sm text-slate-600">
-            Already have an account?{' '}
-            <Link to="/login" className="font-semibold text-blue-600 hover:text-blue-500">
-              Sign in here
-            </Link>
+
+          <div className="inline-flex items-center gap-2 bg-white/10 border border-white/20 rounded-full px-4 py-2 text-sm text-white font-semibold mb-6 self-start">
+            <FaRocket size={14} style={{ color: '#fef08a' }} />
+            Join 1,200+ businesses today
+          </div>
+
+          <h1 className="text-4xl font-extrabold text-white leading-tight mb-4" style={{ fontFamily: 'Outfit, sans-serif' }}>
+            Start finding your<br />
+            <span style={{ color: '#fef08a' }}>perfect customers</span><br />
+            in minutes
+          </h1>
+          <p className="text-lg leading-relaxed max-w-sm" style={{ color: '#ffedd5' }}>
+            Sign up free, browse datasets instantly. No setup fees, no commitment.
+          </p>
+
+          <div className="mt-10 rounded-2xl border border-white/20 bg-white/10 backdrop-blur-sm p-5 space-y-3">
+            <p className="text-xs font-extrabold uppercase tracking-widest mb-3" style={{ color: '#fef08a' }}>What you get for free</p>
+            {[
+              'Preview any dataset before buying',
+              'Sample 10 records from any database',
+              'Dashboard to manage all downloads',
+              'GST invoice on every purchase',
+            ].map((item) => (
+              <div key={item} className="flex items-center gap-2.5 text-sm" style={{ color: '#fff7ed' }}>
+                <FaCheckCircle size={14} style={{ color: '#fef08a', flexShrink: 0 }} />
+                {item}
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div className="relative z-10 p-10">
+          <p className="text-xs" style={{ color: 'rgba(254,240,138,0.7)' }}>
+            © 2026 DataB2B · hello@datab2b.in · +91 81005 37052
           </p>
         </div>
+      </div>
 
-        <div className="rounded-3xl border border-slate-200 bg-white p-8 shadow-xl">
-          <form className="space-y-6">
-            <div>
-              <label htmlFor="name" className="block text-sm font-medium text-slate-700">
-                Full Name
-              </label>
-              <div className="relative mt-1">
-                <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-                  <User className="h-5 w-5 text-slate-400" />
+      {/* Left panel — form */}
+      <div className="flex w-full lg:w-1/2 items-center justify-center px-4 py-10 sm:px-8">
+        <motion.div
+          initial={{ opacity: 0, y: 24, scale: 0.97 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          transition={{ duration: 0.5 }}
+          className="w-full max-w-md"
+        >
+          {/* Mobile logo */}
+          <div className="lg:hidden text-center mb-10">
+            <Link to="/" className="inline-flex items-center gap-2.5">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl text-white shadow-lg" style={{ background: 'linear-gradient(135deg, #f97316, #f59e0b)' }}>
+                <MdDataset size={22} />
+              </div>
+              <span className="text-2xl font-extrabold tracking-tight text-stone-900" style={{ fontFamily: 'Outfit, sans-serif' }}>
+                data<span className="gradient-text">.b2b</span>
+              </span>
+            </Link>
+          </div>
+
+          <div className="mb-8">
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-orange-100 border border-orange-200 px-4 py-1.5 text-xs font-bold text-orange-700 mb-4">
+              <HiSparkles size={13} style={{ color: '#f97316' }} />
+              Free Account · No Credit Card
+            </span>
+            <h2 className="text-3xl font-extrabold text-stone-900" style={{ fontFamily: 'Outfit, sans-serif' }}>
+              Create your account
+            </h2>
+            <p className="mt-2 text-sm text-stone-500">
+              Already have an account?{' '}
+              <Link to="/login" className="font-bold text-orange-600 hover:text-orange-700 hover:underline">
+                Sign in here →
+              </Link>
+            </p>
+          </div>
+
+          <div className="rounded-3xl border-2 border-orange-100 bg-white/90 backdrop-blur-sm p-8 shadow-xl shadow-orange-100/50">
+            <form className="space-y-4">
+
+              {/* Full Name */}
+              <div>
+                <label htmlFor="name" className="block text-sm font-bold text-stone-700 mb-1.5">Full Name</label>
+                <div className="relative">
+                  <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5">
+                    <MdPerson size={20} style={{ color: '#fb923c' }} />
+                  </div>
+                  <input id="name" name="name" type="text" required
+                    className="block w-full rounded-xl border-2 border-orange-100 bg-orange-50/40 py-3 pl-10 pr-4 text-stone-900 text-sm outline-none transition-all focus:border-orange-400 focus:ring-4 focus:ring-orange-100 placeholder-stone-400"
+                    placeholder="John Doe" />
                 </div>
-                <input
-                  id="name"
-                  name="name"
-                  type="text"
-                  required
-                  className="block w-full rounded-xl border border-slate-200 bg-slate-50 py-3 pl-10 pr-3 text-slate-900 outline-none transition-all focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
-                  placeholder="John Doe"
-                />
               </div>
-            </div>
 
-            <div>
-              <label htmlFor="email" className="block text-sm font-medium text-slate-700">
-                Email Address
-              </label>
-              <div className="relative mt-1">
-                <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-                  <Mail className="h-5 w-5 text-slate-400" />
+              {/* Phone */}
+              <div>
+                <label htmlFor="phone" className="block text-sm font-bold text-stone-700 mb-1.5">Phone Number</label>
+                <div className="relative">
+                  <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5">
+                    <MdPhone size={20} style={{ color: '#fb923c' }} />
+                  </div>
+                  <input id="phone" name="phone" type="tel"
+                    className="block w-full rounded-xl border-2 border-orange-100 bg-orange-50/40 py-3 pl-10 pr-4 text-stone-900 text-sm outline-none transition-all focus:border-orange-400 focus:ring-4 focus:ring-orange-100 placeholder-stone-400"
+                    placeholder="+91 98765 43210" />
                 </div>
-                <input
-                  id="email"
-                  name="email"
-                  type="email"
-                  autoComplete="email"
-                  required
-                  className="block w-full rounded-xl border border-slate-200 bg-slate-50 py-3 pl-10 pr-3 text-slate-900 outline-none transition-all focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
-                  placeholder="name@company.com"
-                />
               </div>
-            </div>
 
-            <div>
-              <label htmlFor="password" className="block text-sm font-medium text-slate-700">
-                Password
-              </label>
-              <div className="relative mt-1">
-                <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-                  <Lock className="h-5 w-5 text-slate-400" />
+              {/* Email */}
+              <div>
+                <label htmlFor="email" className="block text-sm font-bold text-stone-700 mb-1.5">Work Email</label>
+                <div className="relative">
+                  <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5">
+                    <MdEmail size={20} style={{ color: '#fb923c' }} />
+                  </div>
+                  <input id="email" name="email" type="email" autoComplete="email" required
+                    className="block w-full rounded-xl border-2 border-orange-100 bg-orange-50/40 py-3 pl-10 pr-4 text-stone-900 text-sm outline-none transition-all focus:border-orange-400 focus:ring-4 focus:ring-orange-100 placeholder-stone-400"
+                    placeholder="name@company.com" />
                 </div>
-                <input
-                  id="password"
-                  name="password"
-                  type="password"
-                  required
-                  className="block w-full rounded-xl border border-slate-200 bg-slate-50 py-3 pl-10 pr-3 text-slate-900 outline-none transition-all focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
-                  placeholder="••••••••"
-                />
               </div>
-              <p className="mt-2 text-xs text-slate-500">
-                Must be at least 8 characters long.
-              </p>
-            </div>
 
-            <div className="flex items-start">
-              <div className="flex h-5 items-center">
-                <input
-                  id="terms"
-                  name="terms"
-                  type="checkbox"
-                  required
-                  className="h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500"
-                />
+              {/* Password */}
+              <div>
+                <label htmlFor="password" className="block text-sm font-bold text-stone-700 mb-1.5">Password</label>
+                <div className="relative">
+                  <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5">
+                    <MdLock size={20} style={{ color: '#fb923c' }} />
+                  </div>
+                  <input id="password" name="password" type="password" required
+                    className="block w-full rounded-xl border-2 border-orange-100 bg-orange-50/40 py-3 pl-10 pr-4 text-stone-900 text-sm outline-none transition-all focus:border-orange-400 focus:ring-4 focus:ring-orange-100 placeholder-stone-400"
+                    placeholder="••••••••" />
+                </div>
+                <p className="mt-1.5 text-xs text-stone-400">Minimum 8 characters</p>
               </div>
-              <div className="ml-3 text-sm">
-                <label htmlFor="terms" className="text-slate-600">
+
+              {/* Terms */}
+              <div className="flex items-start gap-2.5 pt-1">
+                <input id="terms" name="terms" type="checkbox" required
+                  className="mt-0.5 h-4 w-4 rounded border-orange-300 accent-orange-500" />
+                <label htmlFor="terms" className="text-sm text-stone-600 leading-relaxed">
                   I agree to the{' '}
-                  <a href="#" className="font-medium text-blue-600 hover:text-blue-500">
-                    Terms of Service
-                  </a>{' '}
-                  and{' '}
-                  <a href="#" className="font-medium text-blue-600 hover:text-blue-500">
-                    Privacy Policy
-                  </a>
+                  <a href="#" className="font-semibold text-orange-600 hover:underline">Terms of Service</a>
+                  {' '}and{' '}
+                  <a href="#" className="font-semibold text-orange-600 hover:underline">Privacy Policy</a>
                 </label>
               </div>
+
+              {/* Submit */}
+              <button type="submit"
+                className="btn-orange flex w-full items-center justify-center gap-2 py-3.5 rounded-xl text-sm font-extrabold mt-1">
+                Create Free Account
+                <MdArrowForward size={18} />
+              </button>
+            </form>
+
+            {/* Divider */}
+            <div className="my-5 flex items-center gap-3">
+              <div className="flex-1 border-t border-orange-100" />
+              <span className="text-xs font-medium text-stone-400 bg-white px-2">Or sign up with</span>
+              <div className="flex-1 border-t border-orange-100" />
             </div>
 
-            <button
-              type="submit"
-              className="group relative flex w-full justify-center rounded-xl bg-blue-600 px-4 py-3 text-sm font-bold text-white shadow-lg shadow-blue-200 transition-all hover:bg-blue-700"
-            >
-              Create Account
-              <ArrowRight className="ml-2 h-5 w-5" />
+            <button className="flex w-full items-center justify-center gap-3 rounded-xl border-2 border-orange-100 bg-white py-3 text-sm font-bold text-stone-700 hover:border-orange-300 hover:bg-orange-50/50 transition-all shadow-sm">
+              <FaGoogle size={18} style={{ color: '#ef4444' }} />
+              Continue with Google
             </button>
-          </form>
-        </div>
-      </motion.div>
+          </div>
+
+          <div className="flex items-center justify-center gap-2 mt-5 text-xs text-stone-400">
+            <MdShield size={15} style={{ color: '#fb923c' }} />
+            <span>256-bit SSL encryption · Your data is safe</span>
+          </div>
+        </motion.div>
+      </div>
     </div>
   );
 }

@@ -18,34 +18,52 @@ export default function DashboardSidebar() {
   ];
 
   return (
-    <div className="flex h-full w-64 flex-col border-r border-slate-200 bg-white">
-      <div className="flex flex-1 flex-col overflow-y-auto pt-5 pb-4">
-        <nav className="mt-5 flex-1 space-y-1 px-4">
+    <div className="flex h-full w-64 flex-col border-r-2 border-orange-100 bg-white shadow-sm">
+      {/* Brand strip */}
+      <div className="flex items-center gap-3 px-6 py-5 border-b border-orange-100">
+        <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-orange-500 to-amber-500 shadow-md">
+          <LayoutDashboard size={18} className="text-white" />
+        </div>
+        <div>
+          <div className="text-sm font-extrabold text-stone-900">My Dashboard</div>
+          <div className="text-xs text-stone-400">data.b2b</div>
+        </div>
+      </div>
+
+      <div className="flex flex-1 flex-col overflow-y-auto py-4">
+        <nav className="flex-1 space-y-1 px-3">
           {menuItems.map((item) => (
             <Link
               key={item.name}
               to={item.href}
               className={cn(
-                "group flex items-center rounded-xl px-4 py-3 text-sm font-medium transition-all",
+                "group flex items-center rounded-2xl px-4 py-3 text-sm font-semibold transition-all",
                 location.pathname === item.href
-                  ? "bg-blue-50 text-blue-600"
-                  : "text-slate-600 hover:bg-slate-50 hover:text-blue-600"
+                  ? "bg-orange-50 text-orange-700 shadow-sm border border-orange-100"
+                  : "text-stone-500 hover:bg-stone-50 hover:text-stone-800"
               )}
             >
               <item.icon
                 className={cn(
-                  "mr-3 h-5 w-5 flex-shrink-0",
-                  location.pathname === item.href ? "text-blue-600" : "text-slate-400 group-hover:text-blue-600"
+                  "mr-3 h-5 w-5 flex-shrink-0 transition-colors",
+                  location.pathname === item.href
+                    ? "text-orange-500"
+                    : "text-stone-400 group-hover:text-stone-600"
                 )}
               />
               {item.name}
+              {location.pathname === item.href && (
+                <span className="ml-auto h-2 w-2 rounded-full bg-orange-500" />
+              )}
             </Link>
           ))}
         </nav>
       </div>
-      <div className="flex flex-shrink-0 border-t border-slate-200 p-4">
-        <button className="group flex w-full items-center rounded-xl px-4 py-3 text-sm font-medium text-slate-600 hover:bg-red-50 hover:text-red-600 transition-all">
-          <LogOut className="mr-3 h-5 w-5 text-slate-400 group-hover:text-red-600" />
+
+      {/* Logout */}
+      <div className="flex flex-shrink-0 border-t border-orange-100 p-3">
+        <button className="group flex w-full items-center rounded-2xl px-4 py-3 text-sm font-semibold text-stone-500 hover:bg-red-50 hover:text-red-600 transition-all">
+          <LogOut className="mr-3 h-5 w-5 text-stone-400 group-hover:text-red-500 transition-colors" />
           Logout
         </button>
       </div>

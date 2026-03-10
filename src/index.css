@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Outfit:wght@400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Outfit:wght@300;400;500;600;700;800;900&display=swap');
 @import "tailwindcss";
 
 @theme {
@@ -7,7 +7,153 @@
 }
 
 @layer base {
+  :root {
+    --orange-50: #fff7ed;
+    --orange-100: #ffedd5;
+    --orange-200: #fed7aa;
+    --orange-400: #fb923c;
+    --orange-500: #f97316;
+    --orange-600: #ea580c;
+    --orange-700: #c2410c;
+    --warm-50: #fefce8;
+    --warm-100: #fef9c3;
+    --cream: #fffbf5;
+    --bg-light: #fef9f3;
+  }
+
+  * {
+    scroll-behavior: smooth;
+  }
+
   body {
-    @apply bg-white text-slate-900 antialiased;
+    @apply antialiased;
+    background: #fef9f3;
+    color: #1c1917;
+    font-family: 'Inter', sans-serif;
+  }
+
+  ::selection {
+    background: #fed7aa;
+    color: #7c2d12;
+  }
+}
+
+@layer utilities {
+  /* Scrollbar Styles */
+  ::-webkit-scrollbar {
+    width: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    background: #fef3e2;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: #fb923c;
+    border-radius: 10px;
+  }
+
+  /* Orange gradient button */
+  .btn-orange {
+    background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
+    color: white;
+    border-radius: 9999px;
+    font-weight: 700;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 20px rgba(249, 115, 22, 0.35);
+  }
+  .btn-orange:hover {
+    transform: translateY(-2px) scale(1.04);
+    box-shadow: 0 8px 30px rgba(249, 115, 22, 0.5);
+    background: linear-gradient(135deg, #ea580c 0%, #c2410c 100%);
+  }
+
+  /* Soft glass card */
+  .glass-card {
+    background: rgba(255, 251, 245, 0.85);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(251, 146, 60, 0.15);
+    box-shadow: 0 4px 24px rgba(249, 115, 22, 0.06), 0 1px 4px rgba(0,0,0,0.04);
+  }
+
+  /* Gradient text */
+  .gradient-text {
+    background: linear-gradient(135deg, #ea580c 0%, #f97316 40%, #fb923c 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  /* Floating animation */
+  .float-animate {
+    animation: float 6s ease-in-out infinite;
+  }
+  @keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-12px); }
+  }
+
+  /* Shimmer animation */
+  .shimmer {
+    background: linear-gradient(90deg, transparent, rgba(251, 146, 60, 0.15), transparent);
+    background-size: 200% 100%;
+    animation: shimmer 2s infinite;
+  }
+  @keyframes shimmer {
+    0% { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+  }
+
+  /* Pulse glow */
+  .glow-orange {
+    animation: glowPulse 2.5s ease-in-out infinite;
+  }
+  @keyframes glowPulse {
+    0%, 100% { box-shadow: 0 0 20px rgba(249, 115, 22, 0.3); }
+    50% { box-shadow: 0 0 40px rgba(249, 115, 22, 0.6), 0 0 80px rgba(249, 115, 22, 0.2); }
+  }
+
+  /* Carousel fade */
+  @keyframes fadeSlide {
+    0% { opacity: 0; transform: translateX(30px); }
+    100% { opacity: 1; transform: translateX(0); }
+  }
+  .carousel-slide {
+    animation: fadeSlide 0.5s ease forwards;
+  }
+
+  /* Marquee */
+  @keyframes marquee {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+  }
+  .marquee-track {
+    animation: marquee 25s linear infinite;
+  }
+
+  /* Badge pulse */
+  @keyframes badgePulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.06); }
+  }
+  .badge-pulse {
+    animation: badgePulse 2s ease-in-out infinite;
+  }
+
+  /* Counter up animation */
+  @keyframes countUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .count-up {
+    animation: countUp 0.8s ease forwards;
+  }
+
+  /* Warm background gradient */
+  .bg-warm {
+    background: linear-gradient(135deg, #fef9f3 0%, #fff7ed 35%, #fef3e2 65%, #fefce8 100%);
+  }
+
+  /* Section separator blob */
+  .blob-orange {
+    background: radial-gradient(ellipse at center, rgba(251, 146, 60, 0.12) 0%, transparent 70%);
   }
 }

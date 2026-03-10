@@ -3,57 +3,196 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { Filter, ChevronDown } from 'lucide-react';
+import React from 'react';
+import { Filter, ChevronDown, ChevronUp, X } from 'lucide-react';
+import { FaBuilding, FaMapMarkerAlt, FaMoneyBillWave } from 'react-icons/fa';
 
-export default function FilterSidebar() {
-  const filters = [
-    {
-      name: 'Industry',
-      options: ['Technology', 'Healthcare', 'Food & Beverage', 'Real Estate', 'Manufacturing', 'Retail'],
-    },
-    {
-      name: 'Location',
-      options: ['Kolkata', 'Bangalore', 'Mumbai', 'Delhi', 'Hyderabad', 'Chennai'],
-    },
-    {
-      name: 'Price Range',
-      options: ['Under ₹1000', '₹1000 - ₹2000', '₹2000 - ₹5000', 'Above ₹5000'],
-    },
-  ];
+interface FilterSidebarProps {
+  onFilterChange?: (filters: FilterState) => void;
+  activeFilters?: FilterState;
+}
+
+export interface FilterState {
+  industries: string[];
+  locations: string[];
+  priceRanges: string[];
+}
+
+const filterGroups = [
+  {
+    name: 'Industry',
+    key: 'industries' as keyof FilterState,
+    options: ['Technology', 'Healthcare', 'Food & Beverage', 'Real Estate', 'Manufacturing', 'Retail'],
+    icon: FaBuilding,
+    iconColor: 'text-orange-500 bg-orange-50',
+  },
+  {
+    name: 'Location',
+    key: 'locations' as keyof FilterState,
+    options: ['Kolkata', 'Bangalore', 'Mumbai', 'Delhi', 'Hyderabad', 'Chennai'],
+    icon: FaMapMarkerAlt,
+    iconColor: 'text-rose-500 bg-rose-50',
+  },
+  {
+    name: 'Price Range',
+    key: 'priceRanges' as keyof FilterState,
+    options: ['Under ₹1000', '₹1000 - ₹2000', '₹2000 - ₹5000', 'Above ₹5000'],
+    icon: FaMoneyBillWave,
+    iconColor: 'text-emerald-600 bg-emerald-50',
+  },
+];
+
+export default function FilterSidebar({ onFilterChange, activeFilters }: FilterSidebarProps) {
+  const [expanded, setExpanded] = React.useState<Record<string, boolean>>({
+    Industry: true,
+    Location: true,
+    'Price Range': true,
+  });
+
+  const [filters, setFilters] = React.useState<FilterState>(
+    activeFilters ?? { industries: [], locations: [], priceRanges: [] }
+  );
+
+  const toggleOption = (key: keyof FilterState, value: string) => {
+    setFilters((prev) => {
+      const arr = prev[key] as string[];
+      const updated = arr.includes(value)
+        ? arr.filter((v) => v !== value)
+        : [...arr, value];
+      const next = { ...prev, [key]: updated };
+      onFilterChange?.(next);
+      return next;
+    });
+  };
+
+  const clearAll = () => {
+    const reset: FilterState = { industries: [], locations: [], priceRanges: [] };
+    setFilters(reset);
+    onFilterChange?.(reset);
+  };
+
+  const totalActive = filters.industries.length + filters.locations.length + filters.priceRanges.length;
 
   return (
-    <div className="w-full space-y-8 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-      <div className="flex items-center gap-2 border-b border-slate-100 pb-4">
-        <Filter size={20} className="text-blue-600" />
-        <h2 className="text-lg font-bold text-slate-900">Filters</h2>
+    <div className="w-full space-y-1 rounded-2xl border-2 border-orange-100 bg-white/90 p-5 shadow-sm">
+      {/* Header */}
+      <div className="flex items-center justify-between pb-4 border-b border-orange-100 mb-4">
+        <div className="flex items-center gap-2">
+          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-orange-500 to-amber-500 text-white">
+            <Filter size={16} />
+          </div>
+          <h2 className="text-base font-bold text-stone-900">Filters</h2>
+          {totalActive > 0 && (
+            <span className="flex h-5 w-5 items-center justify-center rounded-full bg-orange-500 text-xs font-bold text-white">
+              {totalActive}
+            </span>
+          )}
+        </div>
+        {totalActive > 0 && (
+          <button
+            onClick={clearAll}
+            className="flex items-center gap-1 text-xs font-semibold text-orange-600 hover:text-orange-700 transition-colors"
+          >
+            <X size={14} />
+            Clear All
+          </button>
+        )}
       </div>
 
-      {filters.map((filter) => (
-        <div key={filter.name} className="space-y-4">
-          <div className="flex items-center justify-between">
-            <h3 className="text-sm font-semibold text-slate-900 uppercase tracking-wider">
-              {filter.name}
-            </h3>
-            <ChevronDown size={16} className="text-slate-400" />
+      {filterGroups.map((filter) => {
+        const isExpanded = expanded[filter.name];
+        const activeInGroup = (filters[filter.key] as string[]).length;
+
+        return (
+          <div key={filter.name} className="rounded-xl overflow-hidden mb-2">
+            <button
+              onClick={() => setExpanded((prev) => ({ ...prev, [filter.name]: !prev[filter.name] }))}
+              className="flex w-full items-center justify-between py-3 px-1 hover:text-orange-600 transition-colors"
+            >
+              <div className="flex items-center gap-2">
+              <div className={`flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-lg ${filter.iconColor}`}>
+                <filter.icon size={13} />
+              </div>
+                <span className="text-sm font-bold text-stone-800">{filter.name}</span>
+                {activeInGroup > 0 && (
+                  <span className="flex h-4 w-4 items-center justify-center rounded-full bg-orange-500/10 text-[10px] font-bold text-orange-600">
+                    {activeInGroup}
+                  </span>
+                )}
+              </div>
+              {isExpanded ? (
+                <ChevronUp size={16} className="text-stone-400" />
+              ) : (
+                <ChevronDown size={16} className="text-stone-400" />
+              )}
+            </button>
+
+            {isExpanded && (
+              <div className="space-y-1 pb-3 pl-1">
+                {filter.options.map((option) => {
+                  const isChecked = (filters[filter.key] as string[]).includes(option);
+                  return (
+                    <label
+                      key={option}
+                      className="flex items-center gap-3 cursor-pointer group rounded-xl px-2 py-2 hover:bg-orange-50 transition-all"
+                    >
+                      <div
+                        onClick={() => toggleOption(filter.key, option)}
+                        className={`flex h-4 w-4 flex-shrink-0 items-center justify-center rounded border-2 transition-all cursor-pointer ${
+                          isChecked
+                            ? 'border-orange-500 bg-orange-500'
+                            : 'border-stone-300 bg-white group-hover:border-orange-400'
+                        }`}
+                      >
+                        {isChecked && (
+                          <svg className="h-2.5 w-2.5 text-white" fill="none" viewBox="0 0 12 12">
+                            <path d="M2 6l3 3 5-5" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
+                          </svg>
+                        )}
+                      </div>
+                      <span
+                        onClick={() => toggleOption(filter.key, option)}
+                        className={`text-sm font-medium transition-colors cursor-pointer ${
+                          isChecked ? 'text-orange-700 font-semibold' : 'text-stone-600 group-hover:text-orange-600'
+                        }`}
+                      >
+                        {option}
+                      </span>
+                    </label>
+                  );
+                })}
+              </div>
+            )}
           </div>
-          <div className="space-y-2">
-            {filter.options.map((option) => (
-              <label key={option} className="flex items-center gap-3 cursor-pointer group">
-                <input
-                  type="checkbox"
-                  className="h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500"
-                />
-                <span className="text-sm text-slate-600 group-hover:text-blue-600 transition-colors">
-                  {option}
-                </span>
-              </label>
-            ))}
+        );
+      })}
+
+      {/* Active filters chips */}
+      {totalActive > 0 && (
+        <div className="pt-3 border-t border-orange-100">
+          <p className="text-xs font-semibold text-stone-500 uppercase tracking-wider mb-2">Active Filters</p>
+          <div className="flex flex-wrap gap-2">
+            {Object.entries(filters).flatMap(([key, vals]) =>
+              (vals as string[]).map((v) => (
+                <button
+                  key={`${key}-${v}`}
+                  onClick={() => toggleOption(key as keyof FilterState, v)}
+                  className="flex items-center gap-1.5 rounded-full bg-orange-100 px-3 py-1 text-xs font-bold text-orange-700 hover:bg-orange-200 transition-all border border-orange-200"
+                >
+                  {v}
+                  <X size={10} />
+                </button>
+              ))
+            )}
           </div>
         </div>
-      ))}
+      )}
 
-      <button className="w-full rounded-xl bg-slate-100 py-3 text-sm font-semibold text-slate-900 transition-all hover:bg-slate-200">
-        Clear All Filters
+      <button
+        onClick={clearAll}
+        className="mt-4 w-full rounded-xl border-2 border-orange-100 bg-white py-2.5 text-sm font-bold text-stone-700 transition-all hover:bg-orange-50 hover:border-orange-300 hover:text-orange-700"
+      >
+        Reset All Filters
       </button>
     </div>
   );
