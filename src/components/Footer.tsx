@@ -72,7 +72,6 @@ export default function Footer() {
               {[
                 { label: 'Browse Datasets', href: '/datasets' },
                 { label: 'Categories', href: '/categories' },
-                { label: 'Pricing', href: '/' },
                 { label: 'How it Works', href: '/' },
                 { label: 'API Access', href: '/' },
               ].map((link) => (

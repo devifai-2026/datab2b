@@ -558,117 +558,7 @@ function HowItWorksSection() {
   );
 }
 
-// --- Pricing Section (NEW) ---
-const plans = [
-  {
-    name: 'Starter',
-    price: '₹499',
-    period: '/dataset',
-    desc: 'Perfect for individuals and small teams just starting out.',
-    features: ['1 Dataset Download', 'Up to 5,000 records', 'CSV/Excel Format', 'Email Support', '90-day data validity'],
-    cta: 'Get Started',
-    ctaLink: '/datasets',
-    popular: false,
-    color: 'from-stone-50 to-white',
-    border: 'border-stone-200',
-  },
-  {
-    name: 'Growth',
-    price: '₹2,999',
-    period: '/month',
-    desc: 'Best for growing businesses with consistent data needs.',
-    features: ['5 Dataset Downloads/month', 'Up to 50,000 records each', 'CSV/Excel + API Access', 'Priority Email Support', '180-day data validity', 'Custom filters'],
-    cta: 'Start Growing',
-    ctaLink: '/register',
-    popular: true,
-    color: 'from-orange-50 to-amber-50',
-    border: 'border-orange-300',
-  },
-  {
-    name: 'Enterprise',
-    price: 'Custom',
-    period: '',
-    desc: 'Tailored for large enterprises with bulk data requirements.',
-    features: ['Unlimited Downloads', 'Unlimited Records', 'Dedicated Account Manager', 'API Integration', 'Annual data refresh', 'Custom industry datasets'],
-    cta: 'Contact Sales',
-    ctaLink: '/categories',
-    popular: false,
-    color: 'from-stone-900 to-stone-800',
-    border: 'border-stone-700',
-    dark: true,
-  },
-];
 
-function PricingSection() {
-  return (
-    <section className="py-24 bg-white/50 backdrop-blur-sm relative overflow-hidden">
-      <div className="absolute -top-40 -right-40 w-96 h-96 bg-orange-100/60 rounded-full blur-3xl -z-10" />
-      <div className="absolute -bottom-40 -left-40 w-96 h-96 bg-amber-100/60 rounded-full blur-3xl -z-10" />
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          className="text-center mb-16"
-        >
-          <span className="inline-flex items-center gap-2 rounded-full bg-orange-100 px-4 py-2 text-sm font-bold text-orange-700 mb-4">
-            <Zap size={16} /> Simple Pricing
-          </span>
-          <h2 className="text-4xl font-extrabold text-stone-900 sm:text-5xl" style={{ fontFamily: 'Outfit, sans-serif' }}>
-            Plans for <span className="gradient-text">Every Business</span>
-          </h2>
-          <p className="mt-4 text-lg text-stone-600 max-w-xl mx-auto">No hidden fees. Pay once, download instantly. Scale as you grow.</p>
-        </motion.div>
-
-        <div className="grid grid-cols-1 gap-8 md:grid-cols-3">
-          {plans.map((plan, idx) => (
-            <motion.div
-              key={idx}
-              initial={{ opacity: 0, y: 50, scale: 0.95 }}
-              whileInView={{ opacity: 1, y: 0, scale: 1 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: idx * 0.12 }}
-              whileHover={{ y: -8 }}
-              className={`relative flex flex-col rounded-3xl border-2 ${plan.border} bg-gradient-to-br ${plan.color} p-8 shadow-lg transition-all`}
-            >
-              {plan.popular && (
-                <div className="absolute -top-4 left-1/2 -translate-x-1/2 btn-orange px-4 py-1.5 text-xs font-black rounded-full glow-orange whitespace-nowrap">
-                  ⚡ Most Popular
-                </div>
-              )}
-              <div className={`text-sm font-bold uppercase tracking-widest mb-2 ${plan.dark ? 'text-orange-400' : 'text-orange-600'}`}>
-                {plan.name}
-              </div>
-              <div className={`flex items-baseline gap-1 mb-2 ${plan.dark ? 'text-white' : 'text-stone-900'}`}>
-                <span className="text-5xl font-extrabold" style={{ fontFamily: 'Outfit, sans-serif' }}>{plan.price}</span>
-                <span className={`text-sm font-medium ${plan.dark ? 'text-stone-400' : 'text-stone-500'}`}>{plan.period}</span>
-              </div>
-              <p className={`text-sm mb-8 ${plan.dark ? 'text-stone-400' : 'text-stone-600'}`}>{plan.desc}</p>
-              <ul className="flex-1 space-y-3 mb-8">
-                {plan.features.map((feat) => (
-                  <li key={feat} className={`flex items-center gap-3 text-sm ${plan.dark ? 'text-stone-300' : 'text-stone-700'}`}>
-                    <Check size={16} className="text-orange-500 flex-shrink-0" />
-                    {feat}
-                  </li>
-                ))}
-              </ul>
-              <Link
-                to={plan.ctaLink}
-                className={plan.popular
-                  ? 'btn-orange flex items-center justify-center gap-2 px-6 py-4 text-base font-bold rounded-2xl'
-                  : `flex items-center justify-center gap-2 px-6 py-4 text-base font-bold rounded-2xl border-2 transition-all ${plan.dark ? 'border-orange-500/50 text-orange-400 hover:bg-orange-500 hover:text-white' : 'border-orange-200 text-orange-700 hover:bg-orange-50 hover:border-orange-400'}`
-                }
-              >
-                {plan.cta}
-                <ArrowRight size={18} />
-              </Link>
-            </motion.div>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
 
 // --- Testimonials ---
 function TestimonialsSection() {
@@ -826,7 +716,7 @@ export default function LandingPage() {
       <CategoriesSection />
       <PopularDatasetsSection />
       <HowItWorksSection />
-      <PricingSection />
+
       <TestimonialsSection />
       <CTASection />
     </div>

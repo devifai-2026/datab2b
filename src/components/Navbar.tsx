@@ -22,7 +22,6 @@ export default function Navbar() {
   const navLinks = [
     { name: 'Datasets', href: '/datasets' },
     { name: 'Categories', href: '/categories' },
-    { name: 'Pricing', href: '/pricing' },
     { name: 'About', href: '/about' },
   ];
 

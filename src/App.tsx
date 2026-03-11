@@ -15,7 +15,6 @@ import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import DashboardPage from './pages/DashboardPage';
 import AboutPage from './pages/AboutPage';
-import PricingPage from './pages/PricingPage';
 import { useEffect } from 'react';
 
 // Scroll to top on route change
@@ -47,7 +46,6 @@ function AppContent() {
           <Route path="/register" element={<RegisterPage />} />
           <Route path="/dashboard/*" element={<DashboardPage />} />
           <Route path="/about" element={<AboutPage />} />
-          <Route path="/pricing" element={<PricingPage />} />
         </Routes>
       </main>
       {!isAuthPage && !isDashboard && <Footer />}
