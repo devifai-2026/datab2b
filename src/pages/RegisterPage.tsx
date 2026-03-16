@@ -1,15 +1,58 @@
-/**
- * @license
- * SPDX-License-Identifier: Apache-2.0
- */
-
-import { Link } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'motion/react';
-import { MdEmail, MdLock, MdPerson, MdArrowForward, MdDataset, MdShield, MdPhone } from 'react-icons/md';
-import { FaGoogle, FaCheckCircle, FaRocket } from 'react-icons/fa';
+import { useDispatch, useSelector } from 'react-redux';
+import { toast } from 'react-toastify';
+import { register, reset } from '../store/slices/authSlice';
+import { RootState, AppDispatch } from '../store/store';
+import { MdEmail, MdLock, MdPerson, MdArrowForward, MdDataset, MdShield, MdPhone, MdVisibility, MdVisibilityOff } from 'react-icons/md';
+import { FaCheckCircle, FaRocket } from 'react-icons/fa';
 import { HiSparkles } from 'react-icons/hi2';
 
 export default function RegisterPage() {
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    password: '',
+    phone: '',
+  });
+  const [showPassword, setShowPassword] = useState(false);
+
+  const { name, email, password, phone } = formData;
+
+  const navigate = useNavigate();
+  const dispatch = useDispatch<AppDispatch>();
+
+  const { user, isLoading, isError, isSuccess, message } = useSelector(
+    (state: RootState) => state.auth
+  );
+
+  useEffect(() => {
+    if (isError) {
+      toast.error(message);
+    }
+
+    if (isSuccess) {
+      toast.success('Account created successfully!');
+      navigate('/');
+    }
+
+    dispatch(reset());
+  }, [isError, isSuccess, message, navigate, dispatch]);
+
+  const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFormData((prevState) => ({
+      ...prevState,
+      [e.target.name]: e.target.value,
+    }));
+  };
+
+  const onSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    const userData = { name, email, password };
+    dispatch(register(userData));
+  };
+
   return (
     <div className="relative flex min-h-screen overflow-hidden" style={{ background: 'linear-gradient(135deg, #fff7ed 0%, #fff3e0 50%, #fef9f0 100%)' }}>
 
@@ -35,7 +78,7 @@ export default function RegisterPage() {
           </Link>
 
           <div className="inline-flex items-center gap-2 bg-white/10 border border-white/20 rounded-full px-4 py-2 text-sm text-white font-semibold mb-6 self-start">
-            <FaRocket size={14} style={{ color: '#fef08a' }} />
+            <FaRocket size={14} color="#fef08a" />
             Join 1,200+ businesses today
           </div>
 
@@ -57,7 +100,7 @@ export default function RegisterPage() {
               'GST invoice on every purchase',
             ].map((item) => (
               <div key={item} className="flex items-center gap-2.5 text-sm" style={{ color: '#fff7ed' }}>
-                <FaCheckCircle size={14} style={{ color: '#fef08a', flexShrink: 0 }} />
+                <FaCheckCircle size={14} color="#fef08a" />
                 {item}
               </div>
             ))}
@@ -93,7 +136,7 @@ export default function RegisterPage() {
 
           <div className="mb-8">
             <span className="inline-flex items-center gap-1.5 rounded-full bg-orange-100 border border-orange-200 px-4 py-1.5 text-xs font-bold text-orange-700 mb-4">
-              <HiSparkles size={13} style={{ color: '#f97316' }} />
+              <HiSparkles size={13} color="#f97316" />
               Free Account · No Credit Card
             </span>
             <h2 className="text-3xl font-extrabold text-stone-900" style={{ fontFamily: 'Outfit, sans-serif' }}>
@@ -108,16 +151,18 @@ export default function RegisterPage() {
           </div>
 
           <div className="rounded-3xl border-2 border-orange-100 bg-white/90 backdrop-blur-sm p-8 shadow-xl shadow-orange-100/50">
-            <form className="space-y-4">
+            <form className="space-y-4" onSubmit={onSubmit}>
 
               {/* Full Name */}
               <div>
                 <label htmlFor="name" className="block text-sm font-bold text-stone-700 mb-1.5">Full Name</label>
                 <div className="relative">
                   <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5">
-                    <MdPerson size={20} style={{ color: '#fb923c' }} />
+                    <MdPerson size={20} color="#fb923c" />
                   </div>
                   <input id="name" name="name" type="text" required
+                    value={name}
+                    onChange={onChange}
                     className="block w-full rounded-xl border-2 border-orange-100 bg-orange-50/40 py-3 pl-10 pr-4 text-stone-900 text-sm outline-none transition-all focus:border-orange-400 focus:ring-4 focus:ring-orange-100 placeholder-stone-400"
                     placeholder="John Doe" />
                 </div>
@@ -128,9 +173,11 @@ export default function RegisterPage() {
                 <label htmlFor="phone" className="block text-sm font-bold text-stone-700 mb-1.5">Phone Number</label>
                 <div className="relative">
                   <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5">
-                    <MdPhone size={20} style={{ color: '#fb923c' }} />
+                    <MdPhone size={20} color="#fb923c" />
                   </div>
                   <input id="phone" name="phone" type="tel"
+                    value={phone}
+                    onChange={onChange}
                     className="block w-full rounded-xl border-2 border-orange-100 bg-orange-50/40 py-3 pl-10 pr-4 text-stone-900 text-sm outline-none transition-all focus:border-orange-400 focus:ring-4 focus:ring-orange-100 placeholder-stone-400"
                     placeholder="+91 98765 43210" />
                 </div>
@@ -141,9 +188,11 @@ export default function RegisterPage() {
                 <label htmlFor="email" className="block text-sm font-bold text-stone-700 mb-1.5">Work Email</label>
                 <div className="relative">
                   <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5">
-                    <MdEmail size={20} style={{ color: '#fb923c' }} />
+                    <MdEmail size={20} color="#fb923c" />
                   </div>
                   <input id="email" name="email" type="email" autoComplete="email" required
+                    value={email}
+                    onChange={onChange}
                     className="block w-full rounded-xl border-2 border-orange-100 bg-orange-50/40 py-3 pl-10 pr-4 text-stone-900 text-sm outline-none transition-all focus:border-orange-400 focus:ring-4 focus:ring-orange-100 placeholder-stone-400"
                     placeholder="name@company.com" />
                 </div>
@@ -154,11 +203,20 @@ export default function RegisterPage() {
                 <label htmlFor="password" className="block text-sm font-bold text-stone-700 mb-1.5">Password</label>
                 <div className="relative">
                   <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5">
-                    <MdLock size={20} style={{ color: '#fb923c' }} />
+                    <MdLock size={20} color="#fb923c" />
                   </div>
-                  <input id="password" name="password" type="password" required
-                    className="block w-full rounded-xl border-2 border-orange-100 bg-orange-50/40 py-3 pl-10 pr-4 text-stone-900 text-sm outline-none transition-all focus:border-orange-400 focus:ring-4 focus:ring-orange-100 placeholder-stone-400"
+                  <input id="password" name="password" type={showPassword ? 'text' : 'password'} required
+                    value={password}
+                    onChange={onChange}
+                    className="block w-full rounded-xl border-2 border-orange-100 bg-orange-50/40 py-3 pl-10 pr-12 text-stone-900 text-sm outline-none transition-all focus:border-orange-400 focus:ring-4 focus:ring-orange-100 placeholder-stone-400"
                     placeholder="••••••••" />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute inset-y-0 right-0 flex items-center pr-3.5 text-stone-400 hover:text-orange-600 transition-colors"
+                  >
+                    {showPassword ? <MdVisibilityOff size={20} /> : <MdVisibility size={20} />}
+                  </button>
                 </div>
                 <p className="mt-1.5 text-xs text-stone-400">Minimum 8 characters</p>
               </div>
@@ -177,27 +235,16 @@ export default function RegisterPage() {
 
               {/* Submit */}
               <button type="submit"
-                className="btn-orange flex w-full items-center justify-center gap-2 py-3.5 rounded-xl text-sm font-extrabold mt-1">
-                Create Free Account
+                disabled={isLoading}
+                className="btn-orange flex w-full items-center justify-center gap-2 py-3.5 rounded-xl text-sm font-extrabold mt-1 disabled:opacity-50">
+                {isLoading ? 'Creating Account...' : 'Create Free Account'}
                 <MdArrowForward size={18} />
               </button>
             </form>
-
-            {/* Divider */}
-            <div className="my-5 flex items-center gap-3">
-              <div className="flex-1 border-t border-orange-100" />
-              <span className="text-xs font-medium text-stone-400 bg-white px-2">Or sign up with</span>
-              <div className="flex-1 border-t border-orange-100" />
-            </div>
-
-            <button className="flex w-full items-center justify-center gap-3 rounded-xl border-2 border-orange-100 bg-white py-3 text-sm font-bold text-stone-700 hover:border-orange-300 hover:bg-orange-50/50 transition-all shadow-sm">
-              <FaGoogle size={18} style={{ color: '#ef4444' }} />
-              Continue with Google
-            </button>
           </div>
 
           <div className="flex items-center justify-center gap-2 mt-5 text-xs text-stone-400">
-            <MdShield size={15} style={{ color: '#fb923c' }} />
+            <MdShield size={15} color="#fb923c" />
             <span>256-bit SSL encryption · Your data is safe</span>
           </div>
         </motion.div>
@@ -205,3 +252,5 @@ export default function RegisterPage() {
     </div>
   );
 }
+
+

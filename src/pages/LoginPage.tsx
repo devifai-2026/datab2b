@@ -1,15 +1,56 @@
-/**
- * @license
- * SPDX-License-Identifier: Apache-2.0
- */
-
-import { Link } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'motion/react';
-import { MdEmail, MdLock, MdArrowForward, MdDataset, MdShield } from 'react-icons/md';
-import { FaGoogle, FaCheckCircle } from 'react-icons/fa';
+import { useDispatch, useSelector } from 'react-redux';
+import { toast } from 'react-toastify';
+import { login, reset } from '../store/slices/authSlice';
+import { RootState, AppDispatch } from '../store/store';
+import { MdEmail, MdLock, MdArrowForward, MdDataset, MdShield, MdVisibility, MdVisibilityOff } from 'react-icons/md';
+import { FaCheckCircle } from 'react-icons/fa';
 import { HiSparkles } from 'react-icons/hi2';
 
 export default function LoginPage() {
+  const [formData, setFormData] = useState({
+    email: '',
+    password: '',
+  });
+  const [showPassword, setShowPassword] = useState(false);
+
+  const { email, password } = formData;
+
+  const navigate = useNavigate();
+  const dispatch = useDispatch<AppDispatch>();
+
+  const { user, isLoading, isError, isSuccess, message } = useSelector(
+    (state: RootState) => state.auth
+  );
+
+  useEffect(() => {
+    if (isError) {
+      toast.error(message);
+    }
+
+    if (isSuccess) {
+      toast.success('Logged in successfully!');
+      navigate('/');
+    }
+
+    dispatch(reset());
+  }, [isError, isSuccess, message, navigate, dispatch]);
+
+  const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFormData((prevState) => ({
+      ...prevState,
+      [e.target.name]: e.target.value,
+    }));
+  };
+
+  const onSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    const userData = { email, password };
+    dispatch(login(userData));
+  };
+
   return (
     <div className="relative flex min-h-screen overflow-hidden" style={{ background: 'linear-gradient(135deg, #fff7ed 0%, #fff3e0 50%, #fef9f0 100%)' }}>
 
@@ -51,7 +92,7 @@ export default function LoginPage() {
               'Instant CSV / Excel Download',
             ].map((item) => (
               <div key={item} className="flex items-center gap-2.5 text-sm" style={{ color: '#fff7ed' }}>
-                <FaCheckCircle size={15} style={{ color: '#fed7aa', flexShrink: 0 }} />
+                <FaCheckCircle size={15} color="#fed7aa" />
                 <span className="font-medium">{item}</span>
               </div>
             ))}
@@ -87,7 +128,7 @@ export default function LoginPage() {
 
           <div className="mb-8">
             <span className="inline-flex items-center gap-1.5 rounded-full bg-orange-100 border border-orange-200 px-4 py-1.5 text-xs font-bold text-orange-700 mb-4">
-              <HiSparkles size={13} style={{ color: '#f97316' }} />
+              <HiSparkles size={13} color="#f97316" />
               Secure Login
             </span>
             <h2 className="text-3xl font-extrabold text-stone-900" style={{ fontFamily: 'Outfit, sans-serif' }}>
@@ -102,7 +143,7 @@ export default function LoginPage() {
           </div>
 
           <div className="rounded-3xl border-2 border-orange-100 bg-white/90 backdrop-blur-sm p-8 shadow-xl shadow-orange-100/50">
-            <form className="space-y-5">
+            <form className="space-y-5" onSubmit={onSubmit}>
 
               {/* Email */}
               <div>
@@ -111,7 +152,7 @@ export default function LoginPage() {
                 </label>
                 <div className="relative">
                   <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5">
-                    <MdEmail size={20} style={{ color: '#fb923c' }} />
+                    <MdEmail size={20} color="#fb923c" />
                   </div>
                   <input
                     id="email"
@@ -119,6 +160,8 @@ export default function LoginPage() {
                     type="email"
                     autoComplete="email"
                     required
+                    value={email}
+                    onChange={onChange}
                     className="block w-full rounded-xl border-2 border-orange-100 bg-orange-50/40 py-3 pl-10 pr-4 text-stone-900 text-sm outline-none transition-all focus:border-orange-400 focus:ring-4 focus:ring-orange-100 placeholder-stone-400"
                     placeholder="name@company.com"
                   />
@@ -131,23 +174,32 @@ export default function LoginPage() {
                   <label htmlFor="password" className="block text-sm font-bold text-stone-700">
                     Password
                   </label>
-                  <a href="#" className="text-xs font-semibold text-orange-600 hover:underline">
+                  <Link to="/forgot-password" className="text-xs font-semibold text-orange-600 hover:underline">
                     Forgot password?
-                  </a>
+                  </Link>
                 </div>
                 <div className="relative">
                   <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5">
-                    <MdLock size={20} style={{ color: '#fb923c' }} />
+                    <MdLock size={20} color="#fb923c" />
                   </div>
                   <input
                     id="password"
                     name="password"
-                    type="password"
+                    type={showPassword ? 'text' : 'password'}
                     autoComplete="current-password"
                     required
-                    className="block w-full rounded-xl border-2 border-orange-100 bg-orange-50/40 py-3 pl-10 pr-4 text-stone-900 text-sm outline-none transition-all focus:border-orange-400 focus:ring-4 focus:ring-orange-100 placeholder-stone-400"
+                    value={password}
+                    onChange={onChange}
+                    className="block w-full rounded-xl border-2 border-orange-100 bg-orange-50/40 py-3 pl-10 pr-12 text-stone-900 text-sm outline-none transition-all focus:border-orange-400 focus:ring-4 focus:ring-orange-100 placeholder-stone-400"
                     placeholder="••••••••"
                   />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute inset-y-0 right-0 flex items-center pr-3.5 text-stone-400 hover:text-orange-600 transition-colors"
+                  >
+                    {showPassword ? <MdVisibilityOff size={20} /> : <MdVisibility size={20} />}
+                  </button>
                 </div>
               </div>
 
@@ -167,30 +219,18 @@ export default function LoginPage() {
               {/* Submit */}
               <button
                 type="submit"
-                className="btn-orange flex w-full items-center justify-center gap-2 py-3.5 rounded-xl text-sm font-extrabold"
+                disabled={isLoading}
+                className="btn-orange flex w-full items-center justify-center gap-2 py-3.5 rounded-xl text-sm font-extrabold disabled:opacity-50"
               >
-                Login to Account
+                {isLoading ? 'Logging in...' : 'Login to Account'}
                 <MdArrowForward size={18} />
               </button>
             </form>
-
-            {/* Divider */}
-            <div className="my-6 flex items-center gap-3">
-              <div className="flex-1 border-t border-orange-100" />
-              <span className="text-xs font-medium text-stone-400 bg-white px-2">Or continue with</span>
-              <div className="flex-1 border-t border-orange-100" />
-            </div>
-
-            {/* Google only */}
-            <button className="flex w-full items-center justify-center gap-3 rounded-xl border-2 border-orange-100 bg-white py-3 text-sm font-bold text-stone-700 hover:border-orange-300 hover:bg-orange-50/50 transition-all shadow-sm">
-              <FaGoogle size={18} style={{ color: '#ef4444' }} />
-              Continue with Google
-            </button>
           </div>
 
           {/* Trust note */}
           <div className="flex items-center justify-center gap-2 mt-5 text-xs text-stone-400">
-            <MdShield size={15} style={{ color: '#fb923c' }} />
+            <MdShield size={15} color="#fb923c" />
             <span>256-bit SSL encryption · Your data is safe</span>
           </div>
         </motion.div>
@@ -198,3 +238,4 @@ export default function LoginPage() {
     </div>
   );
 }
+

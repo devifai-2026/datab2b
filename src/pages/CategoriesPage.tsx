@@ -10,6 +10,8 @@ import { motion, AnimatePresence } from 'motion/react';
 import * as LucideIcons from 'lucide-react';
 import { ArrowRight, ChevronLeft, ChevronRight, Sparkles, TrendingUp, Database } from 'lucide-react';
 import { FaLaptopCode, FaRocket, FaHeartbeat, FaIndustry } from 'react-icons/fa';
+import categoryService from '../services/categoryService';
+import { Category } from '../types';
 
 // ─── Auto-Sliding Banner Data ───────────────────────────────────────────────
 const bannerSlides = [
@@ -223,6 +225,23 @@ function HeroBanner() {
 
 // ─── Main Page ───────────────────────────────────────────────────────────────
 export default function CategoriesPage() {
+  const [categories, setCategories] = React.useState<Category[]>([]);
+  const [isLoading, setIsLoading] = React.useState(true);
+
+  React.useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const data = await categoryService.getCategories();
+        setCategories(data as Category[]);
+      } catch (error) {
+        console.error('Error fetching categories:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchCategories();
+  }, []);
+
   return (
     <div className="min-h-screen bg-warm py-10">
       {/* Page Header */}
@@ -278,12 +297,12 @@ export default function CategoriesPage() {
             All Industries
           </h2>
           <span className="rounded-full bg-orange-100 border border-orange-200 px-3 py-0.5 text-sm font-bold text-orange-700">
-            {CATEGORIES.length} Categories
+            {categories.length} Categories
           </span>
         </motion.div>
 
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {CATEGORIES.map((category, idx) => {
+          {categories.map((category, idx) => {
             const palette = cardPalettes[idx % cardPalettes.length];
             const IconComponent = (LucideIcons as any)[category.icon] || LucideIcons.Database;
 

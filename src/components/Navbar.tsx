@@ -1,17 +1,27 @@
-/**
- * @license
- * SPDX-License-Identifier: Apache-2.0
- */
-
 import React from 'react';
-import { Link, useLocation } from 'react-router-dom';
-import { MdDataset, MdClose, MdMenu } from 'react-icons/md';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { MdDataset, MdClose, MdMenu, MdLogout, MdDashboard } from 'react-icons/md';
+import { useDispatch, useSelector } from 'react-redux';
+import { RootState, AppDispatch } from '../store/store';
+import { logout, reset } from '../store/slices/authSlice';
 import { cn } from '../lib/utils';
+import { toast } from 'react-toastify';
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = React.useState(false);
   const [scrolled, setScrolled] = React.useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
+  const dispatch = useDispatch<AppDispatch>();
+
+  const { user } = useSelector((state: RootState) => state.auth);
+
+  const onLogout = () => {
+    dispatch(logout());
+    dispatch(reset());
+    navigate('/');
+    toast.info('Logged out successfully');
+  };
 
   React.useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20);
@@ -73,18 +83,47 @@ export default function Navbar() {
 
           {/* Auth Buttons */}
           <div className="hidden items-center gap-3 md:flex">
-            <Link
-              to="/login"
-              className="text-sm font-semibold text-stone-600 hover:text-orange-600 transition-colors px-3 py-2"
-            >
-              Login
-            </Link>
-            <Link
-              to="/register"
-              className="btn-orange px-5 py-2.5 text-sm rounded-xl"
-            >
-              Sign Up Free
-            </Link>
+            {user ? (
+              <>
+                <div className="flex items-center gap-2 mr-2">
+                  <div className="h-8 w-8 rounded-full bg-orange-100 flex items-center justify-center text-orange-600 font-bold border border-orange-200">
+                    {user.name?.charAt(0).toUpperCase() || 'U'}
+                  </div>
+                  <span className="text-sm font-bold text-stone-700">
+                    Hi, {user.name?.split(' ')[0]}
+                  </span>
+                </div>
+                <Link
+                  to="/dashboard"
+                  className="flex items-center gap-1.5 text-sm font-semibold text-stone-600 hover:text-orange-600 transition-colors px-3 py-2"
+                >
+                  <MdDashboard size={18} />
+                  Dashboard
+                </Link>
+                <button
+                  onClick={onLogout}
+                  className="flex items-center gap-1.5 text-sm font-semibold text-rose-600 hover:text-rose-700 transition-colors px-3 py-2"
+                >
+                  <MdLogout size={18} />
+                  Logout
+                </button>
+              </>
+            ) : (
+              <>
+                <Link
+                  to="/login"
+                  className="text-sm font-semibold text-stone-600 hover:text-orange-600 transition-colors px-3 py-2"
+                >
+                  Login
+                </Link>
+                <Link
+                  to="/register"
+                  className="btn-orange px-5 py-2.5 text-sm rounded-xl"
+                >
+                  Sign Up Free
+                </Link>
+              </>
+            )}
           </div>
 
           {/* Mobile menu button */}
@@ -119,20 +158,54 @@ export default function Navbar() {
               </Link>
             ))}
             <div className="pt-2 space-y-2">
-              <Link
-                to="/login"
-                className="block rounded-xl px-4 py-3 text-center text-base font-semibold text-stone-600 hover:bg-orange-50 hover:text-orange-600 transition-all border border-stone-200"
-                onClick={() => setIsOpen(false)}
-              >
-                Login
-              </Link>
-              <Link
-                to="/register"
-                className="btn-orange block px-4 py-3 text-center text-base rounded-xl"
-                onClick={() => setIsOpen(false)}
-              >
-                Sign Up Free
-              </Link>
+              {user ? (
+                <>
+                  <div className="flex items-center gap-3 px-4 py-3 border-b border-orange-50 mb-1">
+                    <div className="h-10 w-10 rounded-full bg-orange-100 flex items-center justify-center text-orange-600 font-bold border border-orange-200">
+                      {user.name?.charAt(0).toUpperCase() || 'U'}
+                    </div>
+                    <div>
+                      <p className="text-sm font-bold text-stone-900">{user.name}</p>
+                      <p className="text-xs text-stone-500">{user.email}</p>
+                    </div>
+                  </div>
+                  <Link
+                    to="/dashboard"
+                    className="flex items-center gap-3 rounded-xl px-4 py-3 text-base font-semibold text-stone-600 hover:bg-orange-50 hover:text-orange-600 transition-all"
+                    onClick={() => setIsOpen(false)}
+                  >
+                    <MdDashboard size={20} />
+                    Dashboard
+                  </Link>
+                  <button
+                    onClick={() => {
+                      onLogout();
+                      setIsOpen(false);
+                    }}
+                    className="flex w-full items-center gap-3 rounded-xl px-4 py-3 text-base font-semibold text-rose-600 hover:bg-rose-50 transition-all"
+                  >
+                    <MdLogout size={20} />
+                    Logout
+                  </button>
+                </>
+              ) : (
+                <>
+                  <Link
+                    to="/login"
+                    className="block rounded-xl px-4 py-3 text-center text-base font-semibold text-stone-600 hover:bg-orange-50 hover:text-orange-600 transition-all border border-stone-200"
+                    onClick={() => setIsOpen(false)}
+                  >
+                    Login
+                  </Link>
+                  <Link
+                    to="/register"
+                    className="btn-orange block px-4 py-3 text-center text-base rounded-xl"
+                    onClick={() => setIsOpen(false)}
+                  >
+                    Sign Up Free
+                  </Link>
+                </>
+              )}
             </div>
           </div>
         </div>

@@ -17,6 +17,7 @@ import {
 } from 'react-icons/fa';
 import { MOCK_DATASETS, TESTIMONIALS } from '../constants';
 import DatasetCard from '../components/DatasetCard';
+import dataService from '../services/dataService';
 
 // --- Carousel Component ---
 const heroSlides = [
@@ -410,7 +411,7 @@ function CategoriesSection() {
                 <div
                   className={`flex h-16 w-16 items-center justify-center rounded-2xl ${cat.iconBg} mb-4 group-hover:scale-110 transition-transform duration-300 shadow-sm`}
                 >
-                  <cat.icon size={32} style={{ color: cat.iconColor }} />
+                  <cat.icon size={32} color={cat.iconColor} />
                 </div>
                 <h3 className={`text-sm font-bold ${cat.text}`}>{cat.name}</h3>
                 <p className="mt-1 text-xs text-stone-500 font-medium">{cat.count} Datasets</p>
@@ -425,6 +426,22 @@ function CategoriesSection() {
 
 // --- Popular Datasets ---
 function PopularDatasetsSection() {
+  const [datasets, setDatasets] = React.useState<any[]>([]);
+
+  React.useEffect(() => {
+    const fetchDatasets = async () => {
+      try {
+        const data = await dataService.getAllData();
+        setDatasets((data as any[]).slice(0, 3));
+      } catch (error) {
+        console.error('Error fetching datasets:', error);
+      }
+    };
+    fetchDatasets();
+  }, []);
+
+  const displayDatasets = datasets;
+
   return (
     <section className="py-8">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -452,7 +469,7 @@ function PopularDatasetsSection() {
         </motion.div>
 
         <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
-          {MOCK_DATASETS.slice(0, 3).map((dataset, idx) => (
+          {displayDatasets.map((dataset, idx) => (
             <motion.div
               key={dataset.id}
               initial={{ opacity: 0, y: 40 }}
@@ -545,7 +562,7 @@ function HowItWorksSection() {
               </div>
               {/* React-icon centered */}
               <div className={`flex h-20 w-20 items-center justify-center rounded-3xl bg-gradient-to-br ${item.iconBg} shadow-xl mx-auto mb-5 mt-4 group-hover:scale-110 transition-transform`}>
-                <item.icon size={36} style={{ color: '#ffffff' }} />
+                <item.icon size={36} color="#ffffff" />
               </div>
               <div className="text-5xl font-black text-stone-200 opacity-20 mb-[-1.5rem]">{item.step}</div>
               <h3 className="text-xl font-bold text-stone-900 mt-6">{item.title}</h3>
