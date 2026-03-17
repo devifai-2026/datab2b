@@ -5,12 +5,45 @@
 
 import { useParams, Link } from 'react-router-dom';
 import { MOCK_DATASETS } from '../constants';
-import { CheckCircle2, ArrowLeft, Download, ShieldCheck, Clock, Tag, MapPin, Users, FileSpreadsheet, Star, Zap } from 'lucide-react';
+import { CheckCircle2, ArrowLeft, Download, ShieldCheck, Clock, Tag, MapPin, Users, FileSpreadsheet, Star, Zap, FileText } from 'lucide-react';
 import { motion } from 'motion/react';
+
+import dataService from '../services/dataService';
+import React from 'react';
 
 export default function DatasetDetailPage() {
   const { id } = useParams();
-  const dataset = MOCK_DATASETS.find((d) => d.id === id);
+  const [dataset, setDataset] = React.useState<any>(null);
+  const [isLoading, setIsLoading] = React.useState(true);
+  const sampleRef = React.useRef<HTMLDivElement>(null);
+
+  const scrollToSample = () => {
+    sampleRef.current?.scrollIntoView({ behavior: 'smooth' });
+  };
+
+  React.useEffect(() => {
+    const fetchDataset = async () => {
+      if (!id) return;
+      try {
+        const data = await dataService.getDataById(id);
+        setDataset(data);
+      } catch (error) {
+        console.error('Error fetching dataset detail:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchDataset();
+  }, [id]);
+
+  if (isLoading) {
+    return (
+      <div className="flex h-screen flex-col items-center justify-center bg-warm">
+        <div className="h-12 w-12 animate-spin rounded-full border-4 border-orange-500 border-t-transparent" />
+        <p className="mt-4 text-stone-600 font-bold">Loading dataset details...</p>
+      </div>
+    );
+  }
 
   if (!dataset) {
     return (
@@ -120,6 +153,7 @@ export default function DatasetDetailPage() {
 
             {/* Sample Preview */}
             <motion.div
+              ref={sampleRef}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.2 }}
@@ -148,15 +182,30 @@ export default function DatasetDetailPage() {
                     </tr>
                   </thead>
                   <tbody>
-                    {[1, 2, 3].map((row) => (
-                      <tr key={row} className="border-b border-orange-50 last:border-0 hover:bg-orange-50/30 transition-colors">
-                        {dataset.fields.map((field) => (
-                          <td key={field} className="px-4 py-3">
-                            <div className="h-4 w-20 animate-pulse rounded-lg bg-gradient-to-r from-orange-100 to-amber-100" />
-                          </td>
-                        ))}
-                      </tr>
-                    ))}
+                    {dataset.sampleData && dataset.sampleData.length > 0 ? (
+                      dataset.sampleData.map((row: any, rIdx: number) => (
+                        <tr key={rIdx} className="border-b border-orange-50 last:border-0 hover:bg-orange-50/30 transition-colors">
+                          {Object.values(row).map((val: any, cIdx: number) => {
+                            const displayVal = (typeof val === 'object' && val !== null) ? JSON.stringify(val) : val;
+                            return (
+                              <td key={cIdx} className="px-4 py-3 text-sm text-stone-600 font-medium whitespace-nowrap overflow-hidden text-ellipsis max-w-[200px]">
+                                {rIdx > 0 ? <span className="blur-[3px] select-none">{displayVal}</span> : displayVal}
+                              </td>
+                            );
+                          })}
+                        </tr>
+                      ))
+                    ) : (
+                      [1, 2, 3].map((row) => (
+                        <tr key={row} className="border-b border-orange-50 last:border-0 hover:bg-orange-50/30 transition-colors">
+                          {dataset.fields.map((field: string) => (
+                            <td key={field} className="px-4 py-3">
+                              <div className="h-4 w-20 animate-pulse rounded-lg bg-gradient-to-r from-orange-100 to-amber-100" />
+                            </td>
+                          ))}
+                        </tr>
+                      ))
+                    )}
                   </tbody>
                 </table>
               </div>
@@ -198,7 +247,10 @@ export default function DatasetDetailPage() {
                   <Zap size={20} />
                   Buy Now
                 </Link>
-                <button className="w-full rounded-2xl border-2 border-orange-200 bg-orange-50 py-4 text-base font-bold text-orange-700 transition-all hover:bg-orange-100 hover:border-orange-300">
+                <button 
+                  onClick={scrollToSample}
+                  className="w-full rounded-2xl border-2 border-orange-200 bg-orange-50 py-4 text-base font-bold text-orange-700 transition-all hover:bg-orange-100 hover:border-orange-300"
+                >
                   Preview Sample
                 </button>
               </div>

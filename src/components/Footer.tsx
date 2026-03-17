@@ -73,7 +73,7 @@ export default function Footer() {
                 { label: 'Browse Datasets', href: '/datasets' },
                 { label: 'Categories', href: '/categories' },
                 { label: 'How it Works', href: '/' },
-                { label: 'API Access', href: '/' },
+              
               ].map((link) => (
                 <li key={link.label}>
                   <Link
@@ -92,11 +92,11 @@ export default function Footer() {
             <h3 className="text-xs font-bold uppercase tracking-widest text-orange-400 mb-5">Company</h3>
             <ul className="space-y-3">
               {[
-                { label: 'About Us', href: '/' },
+                { label: 'About Us', href: '/about' },
                 { label: 'Careers', href: '/' },
                 { label: 'Blog', href: '/' },
-                { label: 'Press Kit', href: '/' },
-                { label: 'Contact', href: '/' },
+            
+                { label: 'Contact', href: '/contact' },
               ].map((link) => (
                 <li key={link.label}>
                   <Link
@@ -115,10 +115,9 @@ export default function Footer() {
             <h3 className="text-xs font-bold uppercase tracking-widest text-orange-400 mb-5">Legal</h3>
             <ul className="space-y-3 mb-8">
               {[
-                { label: 'Privacy Policy', href: '/' },
-                { label: 'Terms of Service', href: '/' },
-                { label: 'Cookie Policy', href: '/' },
-                { label: 'Refund Policy', href: '/' },
+                { label: 'Privacy Policy', href: '/privacy-policy' },
+                { label: 'Terms of Service', href: '/terms' },
+                { label: 'Refund Policy', href: '/refund-policy' },
               ].map((link) => (
                 <li key={link.label}>
                   <Link

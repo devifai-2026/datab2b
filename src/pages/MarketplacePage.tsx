@@ -10,6 +10,8 @@ import SearchBar from '../components/SearchBar';
 import FilterSidebar, { FilterState } from '../components/FilterSidebar';
 import { motion, AnimatePresence } from 'motion/react';
 import { SlidersHorizontal, Grid3X3, List, X, Database } from 'lucide-react';
+import dataService from '../services/dataService';
+import { Dataset } from '../types';
 
 const PRICE_RANGES: Record<string, [number, number]> = {
   'Under ₹1000': [0, 999],
@@ -30,9 +32,25 @@ export default function MarketplacePage() {
   const [sortBy, setSortBy] = React.useState('Popularity');
   const [viewMode, setViewMode] = React.useState<'grid' | 'list'>('grid');
   const [showMobileFilters, setShowMobileFilters] = React.useState(false);
+  const [datasets, setDatasets] = React.useState<any[]>([]);
+  const [isLoading, setIsLoading] = React.useState(true);
+
+  React.useEffect(() => {
+    const fetchDatasets = async () => {
+      try {
+        const data = await dataService.getAllData();
+        setDatasets(data as any[]);
+      } catch (error) {
+        console.error('Error fetching datasets:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchDatasets();
+  }, []);
 
   const filteredDatasets = React.useMemo(() => {
-    let results = MOCK_DATASETS.filter((d) => {
+    let results = (datasets || []).filter((d) => {
       // Search query
       const q = searchQuery.toLowerCase();
       if (q && !d.title.toLowerCase().includes(q) && !d.industry.toLowerCase().includes(q) && !d.location.toLowerCase().includes(q)) {
@@ -69,7 +87,7 @@ export default function MarketplacePage() {
     }
 
     return results;
-  }, [searchQuery, filters, sortBy]);
+  }, [searchQuery, filters, sortBy, datasets]);
 
   const totalActiveFilters =
     filters.industries.length + filters.locations.length + filters.priceRanges.length;

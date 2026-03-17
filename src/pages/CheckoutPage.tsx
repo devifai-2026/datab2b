@@ -9,10 +9,37 @@ import { MOCK_DATASETS } from '../constants';
 import { ShieldCheck, CreditCard, Mail, Building2, User, ArrowRight, CheckCircle2, Lock, Download } from 'lucide-react';
 import { motion } from 'motion/react';
 
+import dataService from '../services/dataService';
+
 export default function CheckoutPage() {
   const { id } = useParams();
-  const dataset = MOCK_DATASETS.find((d) => d.id === id);
+  const [dataset, setDataset] = React.useState<any>(null);
+  const [isLoading, setIsLoading] = React.useState(true);
   const [isPaid, setIsPaid] = React.useState(false);
+
+  React.useEffect(() => {
+    const fetchDataset = async () => {
+      if (!id) return;
+      try {
+        const data = await dataService.getDataById(id);
+        setDataset(data);
+      } catch (error) {
+        console.error('Error fetching dataset for checkout:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchDataset();
+  }, [id]);
+
+  if (isLoading) {
+    return (
+      <div className="flex h-screen flex-col items-center justify-center bg-warm">
+        <div className="h-12 w-12 animate-spin rounded-full border-4 border-orange-500 border-t-transparent" />
+        <p className="mt-4 text-stone-600 font-bold">Preparing your secure checkout...</p>
+      </div>
+    );
+  }
 
   if (!dataset) {
     return (
