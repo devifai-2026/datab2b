@@ -10,6 +10,7 @@ import SearchBar from '../components/SearchBar';
 import FilterSidebar, { FilterState } from '../components/FilterSidebar';
 import { motion, AnimatePresence } from 'motion/react';
 import { SlidersHorizontal, Grid3X3, List, X, Database } from 'lucide-react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import dataService from '../services/dataService';
 import { Dataset } from '../types';
 
@@ -23,9 +24,12 @@ const PRICE_RANGES: Record<string, [number, number]> = {
 const SORT_OPTIONS = ['Popularity', 'Newest', 'Price: Low to High', 'Price: High to Low'];
 
 export default function MarketplacePage() {
+  const [searchParams] = useSearchParams();
+  const initialCategory = searchParams.get('category');
+  
   const [searchQuery, setSearchQuery] = React.useState('');
   const [filters, setFilters] = React.useState<FilterState>({
-    industries: [],
+    categories: initialCategory ? [initialCategory] : [],
     locations: [],
     priceRanges: [],
   });
@@ -56,8 +60,8 @@ export default function MarketplacePage() {
       if (q && !d.title.toLowerCase().includes(q) && !d.industry.toLowerCase().includes(q) && !d.location.toLowerCase().includes(q)) {
         return false;
       }
-      // Industry filter
-      if (filters.industries.length > 0 && !filters.industries.includes(d.industry)) return false;
+      // Category filter
+      if (filters.categories.length > 0 && !filters.categories.includes(d.industry)) return false;
       // Location filter
       if (filters.locations.length > 0 && !filters.locations.includes(d.location)) return false;
       // Price filter
@@ -90,7 +94,7 @@ export default function MarketplacePage() {
   }, [searchQuery, filters, sortBy, datasets]);
 
   const totalActiveFilters =
-    filters.industries.length + filters.locations.length + filters.priceRanges.length;
+    filters.categories.length + filters.locations.length + filters.priceRanges.length;
 
   return (
     <div className="min-h-screen bg-warm py-10">
@@ -147,7 +151,7 @@ export default function MarketplacePage() {
           </button>
           {totalActiveFilters > 0 && (
             <button
-              onClick={() => setFilters({ industries: [], locations: [], priceRanges: [] })}
+            onClick={() => setFilters({ categories: [], locations: [], priceRanges: [] })}
               className="flex items-center gap-1 text-sm font-semibold text-orange-600 hover:text-orange-700"
             >
               <X size={14} />
@@ -256,7 +260,7 @@ export default function MarketplacePage() {
                 <button
                   onClick={() => {
                     setSearchQuery('');
-                    setFilters({ industries: [], locations: [], priceRanges: [] });
+                    setFilters({ categories: [], locations: [], priceRanges: [] });
                   }}
                   className="btn-orange mt-6 px-6 py-3 text-sm rounded-xl"
                 >

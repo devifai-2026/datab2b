@@ -6,6 +6,8 @@
 import React from 'react';
 import { Filter, ChevronDown, ChevronUp, X } from 'lucide-react';
 import { FaBuilding, FaMapMarkerAlt, FaMoneyBillWave } from 'react-icons/fa';
+import categoryService from '../services/categoryService';
+import { Category } from '../types';
 
 interface FilterSidebarProps {
   onFilterChange?: (filters: FilterState) => void;
@@ -13,45 +15,58 @@ interface FilterSidebarProps {
 }
 
 export interface FilterState {
-  industries: string[];
+  categories: string[];
   locations: string[];
   priceRanges: string[];
 }
 
-const filterGroups = [
-  {
-    name: 'Industry',
-    key: 'industries' as keyof FilterState,
-    options: ['Technology', 'Healthcare', 'Food & Beverage', 'Real Estate', 'Manufacturing', 'Retail'],
-    icon: FaBuilding,
-    iconColor: 'text-orange-500 bg-orange-50',
-  },
-  {
-    name: 'Location',
-    key: 'locations' as keyof FilterState,
-    options: ['Kolkata', 'Bangalore', 'Mumbai', 'Delhi', 'Hyderabad', 'Chennai'],
-    icon: FaMapMarkerAlt,
-    iconColor: 'text-rose-500 bg-rose-50',
-  },
-  {
-    name: 'Price Range',
-    key: 'priceRanges' as keyof FilterState,
-    options: ['Under ₹1000', '₹1000 - ₹2000', '₹2000 - ₹5000', 'Above ₹5000'],
-    icon: FaMoneyBillWave,
-    iconColor: 'text-emerald-600 bg-emerald-50',
-  },
-];
-
 export default function FilterSidebar({ onFilterChange, activeFilters }: FilterSidebarProps) {
+  const [categories, setCategories] = React.useState<string[]>([]);
   const [expanded, setExpanded] = React.useState<Record<string, boolean>>({
-    Industry: true,
+    Categories: true,
     Location: true,
     'Price Range': true,
   });
 
   const [filters, setFilters] = React.useState<FilterState>(
-    activeFilters ?? { industries: [], locations: [], priceRanges: [] }
+    activeFilters ?? { categories: [], locations: [], priceRanges: [] }
   );
+
+  React.useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const data = await categoryService.getCategories();
+        setCategories(data.map((c: Category) => c.name));
+      } catch (error) {
+        console.error('Error fetching categories:', error);
+      }
+    };
+    fetchCategories();
+  }, []);
+
+  const filterGroups = [
+    {
+      name: 'Categories',
+      key: 'categories' as keyof FilterState,
+      options: categories,
+      icon: FaBuilding,
+      iconColor: 'text-orange-500 bg-orange-50',
+    },
+    {
+      name: 'Location',
+      key: 'locations' as keyof FilterState,
+      options: ['Kolkata', 'Bangalore', 'Mumbai', 'Delhi', 'Hyderabad', 'Chennai'],
+      icon: FaMapMarkerAlt,
+      iconColor: 'text-rose-500 bg-rose-50',
+    },
+    {
+      name: 'Price Range',
+      key: 'priceRanges' as keyof FilterState,
+      options: ['Under ₹1000', '₹1000 - ₹2000', '₹2000 - ₹5000', 'Above ₹5000'],
+      icon: FaMoneyBillWave,
+      iconColor: 'text-emerald-600 bg-emerald-50',
+    },
+  ];
 
   const toggleOption = (key: keyof FilterState, value: string) => {
     setFilters((prev) => {
@@ -66,12 +81,12 @@ export default function FilterSidebar({ onFilterChange, activeFilters }: FilterS
   };
 
   const clearAll = () => {
-    const reset: FilterState = { industries: [], locations: [], priceRanges: [] };
+    const reset: FilterState = { categories: [], locations: [], priceRanges: [] };
     setFilters(reset);
     onFilterChange?.(reset);
   };
 
-  const totalActive = filters.industries.length + filters.locations.length + filters.priceRanges.length;
+  const totalActive = filters.categories.length + filters.locations.length + filters.priceRanges.length;
 
   return (
     <div className="w-full space-y-1 rounded-2xl border-2 border-orange-100 bg-white/90 p-5 shadow-sm">

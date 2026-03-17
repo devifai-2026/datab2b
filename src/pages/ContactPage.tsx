@@ -7,18 +7,47 @@ import React from 'react';
 import { motion } from 'motion/react';
 import { Mail, Phone, MapPin, Send, MessageSquare } from 'lucide-react';
 import { toast } from 'react-toastify';
+import contactService from '../services/contactService';
 
 export default function ContactPage() {
   const [isSubmitting, setIsSubmitting] = React.useState(false);
+  const [formData, setFormData] = React.useState({
+    firstName: '',
+    lastName: '',
+    email: '',
+    service: 'B2B Technology Data',
+    message: ''
+  });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const { firstName, lastName, email, service, message } = formData;
+
+  const onChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+    setFormData((prev) => ({
+      ...prev,
+      [e.target.name]: e.target.value
+    }));
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
-    // Simulate API call
-    setTimeout(() => {
-      setIsSubmitting(false);
+    
+    try {
+      await contactService.sendInquiry(formData);
       toast.success("Message sent successfully! We'll get back to you soon.");
-    }, 1500);
+      setFormData({
+        firstName: '',
+        lastName: '',
+        email: '',
+        service: 'B2B Technology Data',
+        message: ''
+      });
+    } catch (error) {
+      console.error('Submission Error:', error);
+      toast.error("Failed to send message. Please try again later.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -126,6 +155,9 @@ export default function ContactPage() {
                   <input
                     required
                     type="text"
+                    name="firstName"
+                    value={firstName}
+                    onChange={onChange}
                     className="w-full bg-stone-50 border-2 border-stone-100 rounded-2xl px-5 py-4 focus:ring-4 focus:ring-orange-100 focus:border-orange-500 transition-all outline-none font-medium text-stone-900"
                     placeholder="John"
                   />
@@ -135,6 +167,9 @@ export default function ContactPage() {
                   <input
                     required
                     type="text"
+                    name="lastName"
+                    value={lastName}
+                    onChange={onChange}
                     className="w-full bg-stone-50 border-2 border-stone-100 rounded-2xl px-5 py-4 focus:ring-4 focus:ring-orange-100 focus:border-orange-500 transition-all outline-none font-medium text-stone-900"
                     placeholder="Doe"
                   />
@@ -146,6 +181,9 @@ export default function ContactPage() {
                 <input
                   required
                   type="email"
+                  name="email"
+                  value={email}
+                  onChange={onChange}
                   className="w-full bg-stone-50 border-2 border-stone-100 rounded-2xl px-5 py-4 focus:ring-4 focus:ring-orange-100 focus:border-orange-500 transition-all outline-none font-medium text-stone-900"
                   placeholder="john@company.com"
                 />
@@ -153,7 +191,12 @@ export default function ContactPage() {
 
               <div>
                 <label className="block text-xs font-bold text-stone-500 uppercase tracking-widest mb-2">Service Interest</label>
-                <select className="w-full bg-stone-50 border-2 border-stone-100 rounded-2xl px-5 py-4 focus:ring-4 focus:ring-orange-100 focus:border-orange-500 transition-all outline-none font-medium text-stone-900 appearance-none">
+                <select 
+                  name="service"
+                  value={service}
+                  onChange={onChange}
+                  className="w-full bg-stone-50 border-2 border-stone-100 rounded-2xl px-5 py-4 focus:ring-4 focus:ring-orange-100 focus:border-orange-500 transition-all outline-none font-medium text-stone-900 appearance-none"
+                >
                   <option>B2B Technology Data</option>
                   <option>Consumer Market Research</option>
                   <option>Healthcare Datasets</option>
@@ -165,6 +208,9 @@ export default function ContactPage() {
                 <label className="block text-xs font-bold text-stone-500 uppercase tracking-widest mb-2">Your Message</label>
                 <textarea
                   required
+                  name="message"
+                  value={message}
+                  onChange={onChange}
                   rows={4}
                   className="w-full bg-stone-50 border-2 border-stone-100 rounded-2xl px-5 py-4 focus:ring-4 focus:ring-orange-100 focus:border-orange-500 transition-all outline-none font-medium text-stone-900 resize-none"
                   placeholder="Tell us about your requirements..."
