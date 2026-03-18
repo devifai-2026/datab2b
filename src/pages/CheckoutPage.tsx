@@ -10,12 +10,30 @@ import { ShieldCheck, CreditCard, Mail, Building2, User, ArrowRight, CheckCircle
 import { motion } from 'motion/react';
 
 import dataService from '../services/dataService';
+import paymentService from '../services/paymentService';
 
 export default function CheckoutPage() {
   const { id } = useParams();
   const [dataset, setDataset] = React.useState<any>(null);
   const [isLoading, setIsLoading] = React.useState(true);
   const [isPaid, setIsPaid] = React.useState(false);
+  const [formData, setFormData] = React.useState({
+    name: '',
+    email: '',
+    company: '',
+    gst: ''
+  });
+
+  // Load Razorpay script
+  React.useEffect(() => {
+    const script = document.createElement('script');
+    script.src = 'https://checkout.razorpay.com/v1/checkout.js';
+    script.async = true;
+    document.body.appendChild(script);
+    return () => {
+      document.body.removeChild(script);
+    };
+  }, []);
 
   React.useEffect(() => {
     const fetchDataset = async () => {
@@ -55,9 +73,81 @@ export default function CheckoutPage() {
     );
   }
 
-  const handlePayment = (e: React.FormEvent) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handlePayment = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsPaid(true);
+
+    if (!(window as any).Razorpay) {
+      alert('Razorpay SDK failed to load. Are you online?');
+      return;
+    }
+
+    try {
+      // 1. Create order on backend
+      const { order } = await paymentService.createOrder(dataset.price);
+
+      const options = {
+        key: 'rzp_test_SG44kbdRqtUqN8', // Enter the Key ID generated from the Dashboard
+        amount: order.amount, // Amount is in currency subunits. Default currency is INR. Hence, 50000 refers to 50000 paise
+        currency: order.currency,
+        name: 'Datab2b',
+        description: `Purchase for ${dataset.title}`,
+        image: '/logo.png', // Or any image URL
+        order_id: order.id, // This is the order ID created by backend
+        handler: async function (response: any) {
+          // This function will be called after successful payment
+          try {
+            const user = JSON.parse(localStorage.getItem('user') || '{}');
+            
+            const verificationRes = await paymentService.verifyPayment({
+              razorpay_order_id: response.razorpay_order_id,
+              razorpay_payment_id: response.razorpay_payment_id,
+              razorpay_signature: response.razorpay_signature,
+              userId: user._id,
+              productId: dataset._id || dataset.id,
+              productName: dataset.title || dataset.name,
+              amount: dataset.price,
+              currency: 'INR',
+              quantity: 1,
+            });
+
+            if (verificationRes.success) {
+              setIsPaid(true);
+            } else {
+              alert('Payment verification failed. Please contact support.');
+            }
+          } catch (error) {
+            console.error('Verification error:', error);
+            alert('Something went wrong during payment verification.');
+          }
+        },
+        prefill: {
+          name: formData.name,
+          email: formData.email,
+        },
+        notes: {
+          company: formData.company,
+          gst: formData.gst,
+          dataset_id: dataset.id,
+        },
+        theme: {
+          color: '#f97316', // Orange-500
+        },
+      };
+
+      const rzp1 = new (window as any).Razorpay(options);
+      rzp1.on('payment.failed', function (response: any) {
+        alert('Payment failed: ' + response.error.description);
+      });
+      rzp1.open();
+    } catch (error) {
+      console.error('Payment initialization error:', error);
+      alert('Failed to initialize payment. Please try again.');
+    }
   };
 
   // ── Payment Success Screen ──────────────────────────────────────────────────
@@ -179,7 +269,10 @@ export default function CheckoutPage() {
                     <label className="block text-sm font-semibold text-stone-700 mb-1.5">Full Name</label>
                     <input
                       type="text"
+                      name="name"
                       required
+                      value={formData.name}
+                      onChange={handleInputChange}
                       className="block w-full rounded-xl border-2 border-stone-200 bg-stone-50 px-4 py-3 text-sm outline-none focus:border-orange-400 focus:ring-2 focus:ring-orange-400/20 transition-all"
                       placeholder="Rahul Sharma"
                     />
@@ -188,7 +281,10 @@ export default function CheckoutPage() {
                     <label className="block text-sm font-semibold text-stone-700 mb-1.5">Email Address</label>
                     <input
                       type="email"
+                      name="email"
                       required
+                      value={formData.email}
+                      onChange={handleInputChange}
                       className="block w-full rounded-xl border-2 border-stone-200 bg-stone-50 px-4 py-3 text-sm outline-none focus:border-orange-400 focus:ring-2 focus:ring-orange-400/20 transition-all"
                       placeholder="rahul@company.com"
                     />
@@ -203,7 +299,10 @@ export default function CheckoutPage() {
                     </div>
                     <input
                       type="text"
+                      name="company"
                       required
+                      value={formData.company}
+                      onChange={handleInputChange}
                       className="block w-full rounded-xl border-2 border-stone-200 bg-stone-50 py-3 pl-10 pr-4 text-sm outline-none focus:border-orange-400 focus:ring-2 focus:ring-orange-400/20 transition-all"
                       placeholder="Acme Pvt. Ltd."
                     />
@@ -214,6 +313,9 @@ export default function CheckoutPage() {
                   <label className="block text-sm font-semibold text-stone-700 mb-1.5">GST Number <span className="text-stone-400 font-normal">(optional)</span></label>
                   <input
                     type="text"
+                    name="gst"
+                    value={formData.gst}
+                    onChange={handleInputChange}
                     className="block w-full rounded-xl border-2 border-stone-200 bg-stone-50 px-4 py-3 text-sm outline-none focus:border-orange-400 focus:ring-2 focus:ring-orange-400/20 transition-all"
                     placeholder="22AAAAA0000A1Z5"
                   />
