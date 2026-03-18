@@ -247,6 +247,15 @@ export default function DatasetDetailPage() {
                   <Zap size={20} />
                   Buy Now
                 </Link>
+                {dataset.link && (
+                  <a 
+                    href={dataset.link}
+                    className="flex w-full items-center justify-center gap-2 rounded-2xl border-2 border-blue-200 bg-blue-50 py-4 text-base font-bold text-blue-700 transition-all hover:bg-blue-100 hover:border-blue-300"
+                  >
+                    <FileText size={20} />
+                    Download/Preview Link
+                  </a>
+                )}
                 <button 
                   onClick={scrollToSample}
                   className="w-full rounded-2xl border-2 border-orange-200 bg-orange-50 py-4 text-base font-bold text-orange-700 transition-all hover:bg-orange-100 hover:border-orange-300"

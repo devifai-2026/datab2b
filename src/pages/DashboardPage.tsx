@@ -361,68 +361,70 @@ function ProfilePage() {
   };
 
   return (
-    <>
-      <div className="mb-6 flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-extrabold text-stone-900" style={{ fontFamily: 'Outfit, sans-serif' }}>My Profile</h1>
-          <p className="text-stone-500 mt-1">Manage your account information.</p>
+    <div className="flex flex-col items-center justify-center">
+      <div className="w-full max-w-lg">
+        <div className="mb-6 flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-extrabold text-stone-900" style={{ fontFamily: 'Outfit, sans-serif' }}>My Profile</h1>
+            <p className="text-stone-500 mt-1">Manage your account information.</p>
+          </div>
+          <button 
+            onClick={onLogout}
+            className="rounded-xl border-2 border-orange-100 px-4 py-2 text-sm font-bold text-orange-600 hover:bg-orange-50 transition-all"
+          >
+            Logout Account
+          </button>
         </div>
-        <button 
-          onClick={onLogout}
-          className="rounded-xl border-2 border-orange-100 px-4 py-2 text-sm font-bold text-orange-600 hover:bg-orange-50 transition-all"
+        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
+          className="rounded-2xl border-2 border-orange-100 bg-white p-8 shadow-sm"
         >
-          Logout Account
-        </button>
+          <div className="flex items-center gap-5 mb-8">
+            <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-orange-500 to-amber-500 shadow-lg">
+              <User size={32} className="text-white" />
+            </div>
+            <div>
+              <h3 className="text-xl font-extrabold text-stone-900">{user?.name || 'User'}</h3>
+              <p className="text-sm text-stone-500">{user?.email || 'email@example.com'}</p>
+              <span className="mt-1 inline-flex items-center gap-1 rounded-full bg-orange-100 px-2 py-0.5 text-xs font-bold text-orange-700">
+                Pro Member
+              </span>
+            </div>
+          </div>
+          <div className="space-y-4">
+            <div>
+              <label className="block text-xs font-bold text-stone-500 uppercase tracking-wider mb-1">Full Name</label>
+              <input
+                type="text"
+                value={formData.name}
+                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                className="block w-full rounded-xl border-2 border-stone-200 bg-stone-50 px-4 py-3 text-sm font-medium text-stone-800 outline-none focus:border-orange-400 focus:ring-2 focus:ring-orange-400/20 transition-all"
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-bold text-stone-500 uppercase tracking-wider mb-1">Email Address</label>
+              <input
+                type="email"
+                value={formData.email}
+                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                className="block w-full rounded-xl border-2 border-stone-200 bg-stone-50 px-4 py-3 text-sm font-medium text-stone-800 outline-none focus:border-orange-400 focus:ring-2 focus:ring-orange-400/20 transition-all"
+              />
+            </div>
+          </div>
+          <button 
+            onClick={handleSaveProfile}
+            disabled={isLoading}
+            className="mt-6 btn-orange flex items-center gap-2 rounded-xl px-6 py-3 text-sm font-bold disabled:opacity-50"
+          >
+            {isLoading ? (
+              <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
+            ) : (
+              <Settings size={15} />
+            )}
+            {isLoading ? 'Saving...' : 'Save Changes'}
+          </button>
+        </motion.div>
       </div>
-      <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
-        className="rounded-2xl border-2 border-orange-100 bg-white p-8 shadow-sm max-w-lg"
-      >
-        <div className="flex items-center gap-5 mb-8">
-          <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-orange-500 to-amber-500 shadow-lg">
-            <User size={32} className="text-white" />
-          </div>
-          <div>
-            <h3 className="text-xl font-extrabold text-stone-900">{user?.name || 'User'}</h3>
-            <p className="text-sm text-stone-500">{user?.email || 'email@example.com'}</p>
-            <span className="mt-1 inline-flex items-center gap-1 rounded-full bg-orange-100 px-2 py-0.5 text-xs font-bold text-orange-700">
-              Pro Member
-            </span>
-          </div>
-        </div>
-        <div className="space-y-4">
-          <div>
-            <label className="block text-xs font-bold text-stone-500 uppercase tracking-wider mb-1">Full Name</label>
-            <input
-              type="text"
-              value={formData.name}
-              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-              className="block w-full rounded-xl border-2 border-stone-200 bg-stone-50 px-4 py-3 text-sm font-medium text-stone-800 outline-none focus:border-orange-400 focus:ring-2 focus:ring-orange-400/20 transition-all"
-            />
-          </div>
-          <div>
-            <label className="block text-xs font-bold text-stone-500 uppercase tracking-wider mb-1">Email Address</label>
-            <input
-              type="email"
-              value={formData.email}
-              onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-              className="block w-full rounded-xl border-2 border-stone-200 bg-stone-50 px-4 py-3 text-sm font-medium text-stone-800 outline-none focus:border-orange-400 focus:ring-2 focus:ring-orange-400/20 transition-all"
-            />
-          </div>
-        </div>
-        <button 
-          onClick={handleSaveProfile}
-          disabled={isLoading}
-          className="mt-6 btn-orange flex items-center gap-2 rounded-xl px-6 py-3 text-sm font-bold disabled:opacity-50"
-        >
-          {isLoading ? (
-            <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
-          ) : (
-            <Settings size={15} />
-          )}
-          {isLoading ? 'Saving...' : 'Save Changes'}
-        </button>
-      </motion.div>
-    </>
+    </div>
   );
 }
 

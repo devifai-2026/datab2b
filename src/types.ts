@@ -16,6 +16,7 @@ export interface Dataset {
   price: number;
   fields: string[];
   lastUpdated: string;
+  link?: string;
 }
 
 export interface Category {
