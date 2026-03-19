@@ -228,11 +228,6 @@ export default function LoginPage() {
             </form>
           </div>
 
-          {/* Trust note */}
-          <div className="flex items-center justify-center gap-2 mt-5 text-xs text-stone-400">
-            <MdShield size={15} color="#fb923c" />
-            <span>256-bit SSL encryption · Your data is safe</span>
-          </div>
         </motion.div>
       </div>
     </div>

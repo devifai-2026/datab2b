@@ -24,7 +24,7 @@ export default function FilterSidebar({ onFilterChange, activeFilters }: FilterS
   const [categories, setCategories] = React.useState<string[]>([]);
   const [expanded, setExpanded] = React.useState<Record<string, boolean>>({
     Categories: true,
-    Location: true,
+    // Location: true,
     'Price Range': true,
   });
 
@@ -52,13 +52,13 @@ export default function FilterSidebar({ onFilterChange, activeFilters }: FilterS
       icon: FaBuilding,
       iconColor: 'text-orange-500 bg-orange-50',
     },
-    {
+    /* {
       name: 'Location',
       key: 'locations' as keyof FilterState,
       options: ['Kolkata', 'Bangalore', 'Mumbai', 'Delhi', 'Hyderabad', 'Chennai'],
       icon: FaMapMarkerAlt,
       iconColor: 'text-rose-500 bg-rose-50',
-    },
+    }, */
     {
       name: 'Price Range',
       key: 'priceRanges' as keyof FilterState,
@@ -86,7 +86,7 @@ export default function FilterSidebar({ onFilterChange, activeFilters }: FilterS
     onFilterChange?.(reset);
   };
 
-  const totalActive = filters.categories.length + filters.locations.length + filters.priceRanges.length;
+  const totalActive = filters.categories.length + /* filters.locations.length + */ filters.priceRanges.length;
 
   return (
     <div className="w-full space-y-1 rounded-2xl border-2 border-orange-100 bg-white/90 p-5 shadow-sm">

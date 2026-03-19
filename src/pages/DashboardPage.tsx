@@ -14,29 +14,57 @@ import { AppDispatch, RootState } from '../store/store';
 import { logout, updateProfile } from '../store/slices/authSlice';
 import { toast } from 'react-toastify';
 import dataService from '../services/dataService';
+import invoiceService from '../services/invoiceService';
 import { jsPDF } from 'jspdf';
+import { io } from 'socket.io-client';
+import Swal from 'sweetalert2';
+
+const socket = io('http://localhost:5000');
 
 // Shared state for the dashboard data
 const useDashboardData = () => {
-  const [datasets, setDatasets] = React.useState<any[]>([]);
+  const { user } = useSelector((state: RootState) => state.auth);
+  const [invoices, setInvoices] = React.useState<any[]>([]);
   const [isLoading, setIsLoading] = React.useState(true);
 
-  React.useEffect(() => {
-    const fetchDatasets = async () => {
-      try {
-        const data = await dataService.getAllData();
-        // For now, we simulate "purchased" by taking the first 2 from backend
-        setDatasets((data as any[]).slice(0, 2));
-      } catch (error) {
-        console.error('Error fetching dashboard datasets:', error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    fetchDatasets();
-  }, []);
+  const fetchInvoices = async () => {
+    if (!user) return;
+    try {
+      const data = await invoiceService.getMyInvoices();
+      setInvoices(data);
+    } catch (error) {
+      console.error('Error fetching dashboard invoices:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
-  return { purchasedDatasets: datasets, isLoading };
+  React.useEffect(() => {
+    fetchInvoices();
+
+    // Socket listeners for real-time
+    socket.on('new_purchased', (data) => {
+      // If the purchase is for THIS user, refresh list
+      if (data.userId === user?.id || data.userId === user?._id) {
+        toast.success(`New purchase confirmed: ${data.productName}`);
+        fetchInvoices();
+      }
+    });
+
+    socket.on('invoice_canceled', (data) => {
+      if (data.userId === user?.id || data.userId === user?._id) {
+        toast.info('An invoice has been canceled');
+        fetchInvoices();
+      }
+    });
+
+    return () => {
+      socket.off('new_purchased');
+      socket.off('invoice_canceled');
+    };
+  }, [user]);
+
+  return { invoices, isLoading, refresh: fetchInvoices };
 };
 
 const downloadInvoice = (dataset: any) => {
@@ -78,7 +106,53 @@ const downloadInvoice = (dataset: any) => {
 function OverviewPage() {
   const { user } = useSelector((state: RootState) => state.auth);
   const [activeTab, setActiveTab] = React.useState<'purchased' | 'links' | 'history'>('purchased');
-  const { purchasedDatasets, isLoading } = useDashboardData();
+  const { invoices, isLoading, refresh } = useDashboardData();
+
+  const handleCancelInvoice = async (invoiceId: string) => {
+    const result = await Swal.fire({
+      title: 'Are you sure?',
+      text: 'Do you want to cancel this purchase? This action will mark your order as canceled.',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#f97316', // Orange-500
+      cancelButtonColor: '#e7e5e4', // Stone-200
+      confirmButtonText: 'Yes, cancel it!',
+      cancelButtonText: 'No, keep it',
+      customClass: {
+        popup: 'rounded-3xl border-2 border-orange-100',
+        confirmButton: 'rounded-xl px-6 py-3 font-bold',
+        cancelButton: 'rounded-xl px-6 py-3 font-bold text-stone-600'
+      }
+    });
+
+    if (result.isConfirmed) {
+      try {
+        await invoiceService.cancelInvoice(invoiceId);
+        Swal.fire({
+          title: 'Canceled!',
+          text: 'Your purchase has been canceled.',
+          icon: 'success',
+          confirmButtonColor: '#f97316',
+          customClass: {
+            popup: 'rounded-3xl border-2 border-orange-100',
+            confirmButton: 'rounded-xl px-6 py-3 font-bold'
+          }
+        });
+        refresh();
+      } catch (error: any) {
+        Swal.fire({
+          title: 'Error!',
+          text: error.response?.data?.message || 'Failed to cancel purchase',
+          icon: 'error',
+          confirmButtonColor: '#f97316',
+          customClass: {
+            popup: 'rounded-3xl border-2 border-orange-100',
+            confirmButton: 'rounded-xl px-6 py-3 font-bold'
+          }
+        });
+      }
+    }
+  };
 
   const tabs = [
     { key: 'purchased', label: 'Purchased Datasets', icon: ShoppingBag },
@@ -86,13 +160,13 @@ function OverviewPage() {
     { key: 'history',  label: 'Order History',       icon: Clock },
   ] as const;
 
-  const totalRecords = purchasedDatasets.reduce((sum, d) => sum + (d.contactCount || 0), 0);
-  const totalSpent = purchasedDatasets.reduce((sum, d) => sum + (d.price || 0), 0);
+  const totalRecords = invoices.filter(i => i.status === 'paid').length; // Simple count for mock logic
+  const totalSpent = invoices.filter(i => i.status === 'paid').reduce((sum, i) => sum + (i.amount || 0), 0);
 
   const stats = [
-    { label: 'Total Purchases',  value: purchasedDatasets.length.toString(),      icon: ShoppingBag, bg: 'bg-orange-50',  text: 'text-orange-600'  },
-    { label: 'Records Unlocked', value: totalRecords.toLocaleString(), icon: Database,    bg: 'bg-violet-50',  text: 'text-violet-600'  },
-    { label: 'Active Downloads', value: purchasedDatasets.length.toString(),      icon: Download,    bg: 'bg-emerald-50', text: 'text-emerald-600' },
+    { label: 'Total Purchases',  value: invoices.filter(i => i.status === 'paid').length.toString(),      icon: ShoppingBag, bg: 'bg-orange-50',  text: 'text-orange-600'  },
+    { label: 'Records Unlocked', value: '50,000+', icon: Database,    bg: 'bg-violet-50',  text: 'text-violet-600'  },
+    { label: 'Active Downloads', value: invoices.filter(i => i.status === 'paid').length.toString(),      icon: Download,    bg: 'bg-emerald-50', text: 'text-emerald-600' },
     { label: 'Total Spent',      value: `₹${totalSpent.toLocaleString()}`, icon: TrendingUp,  bg: 'bg-rose-50',    text: 'text-rose-600'    },
   ];
 
@@ -148,9 +222,9 @@ function OverviewPage() {
              <div className="flex justify-center py-10">
                <div className="h-8 w-8 animate-spin rounded-full border-4 border-orange-500 border-t-transparent" />
              </div>
-          ) : purchasedDatasets.length > 0 ? (
-            purchasedDatasets.map((dataset, idx) => (
-              <motion.div key={dataset.id} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: idx * 0.1 }}
+          ) : invoices.filter(i => i.status === 'paid').length > 0 ? (
+            invoices.filter(i => i.status === 'paid').map((invoice, idx) => (
+              <motion.div key={invoice._id} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: idx * 0.1 }}
                 className="flex flex-col items-center justify-between gap-4 rounded-2xl border-2 border-orange-100 bg-white p-6 shadow-sm hover:border-orange-200 transition-all sm:flex-row"
               >
                 <div className="flex items-center gap-4">
@@ -158,8 +232,8 @@ function OverviewPage() {
                     <ShoppingBag size={22} className="text-white" />
                   </div>
                   <div>
-                    <h3 className="font-extrabold text-stone-900">{dataset.title}</h3>
-                    <p className="text-sm text-stone-400 mt-0.5">{dataset.contactCount.toLocaleString()} Records · Excel &amp; CSV</p>
+                    <h3 className="font-extrabold text-stone-900">{invoice.productName}</h3>
+                    <p className="text-sm text-stone-400 mt-0.5">Quantity: {invoice.quantity} · Excel &amp; CSV</p>
                     <span className="mt-1.5 inline-flex items-center gap-1 rounded-full bg-emerald-100 px-2 py-0.5 text-xs font-bold text-emerald-700">
                       <CheckCircle2 size={10} /> Verified Data
                     </span>
@@ -167,12 +241,11 @@ function OverviewPage() {
                 </div>
                 <div className="flex items-center gap-2">
                   <button 
-                    onClick={() => downloadInvoice(dataset)}
+                    onClick={() => invoiceService.downloadInvoice(invoice._id, `Invoice_${invoice._id.slice(-6)}.pdf`)}
                     className="flex items-center gap-2 rounded-xl bg-orange-50 border border-orange-200 px-4 py-2.5 text-sm font-bold text-orange-700 hover:bg-orange-100 transition-all shadow-sm"
                   >
                     <Download size={16} /> Download PDF
                   </button>
-                  <Link to={`/datasets/${dataset.id}`} className="btn-orange rounded-xl px-5 py-2.5 text-sm font-bold whitespace-nowrap">View Details</Link>
                 </div>
               </motion.div>
             ))
@@ -186,8 +259,8 @@ function OverviewPage() {
 
       {activeTab === 'links' && (
         <div className="space-y-4">
-          {purchasedDatasets.map((dataset, idx) => (
-            <motion.div key={dataset.id} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: idx * 0.1 }}
+          {invoices.filter(i => i.status === 'paid').map((invoice, idx) => (
+            <motion.div key={invoice._id} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: idx * 0.1 }}
               className="flex flex-col items-center justify-between gap-4 rounded-2xl border-2 border-orange-100 bg-white p-6 shadow-sm hover:border-orange-200 transition-all sm:flex-row"
             >
               <div className="flex items-center gap-4">
@@ -195,7 +268,7 @@ function OverviewPage() {
                   <LinkIcon size={20} className="text-white" />
                 </div>
                 <div>
-                  <h3 className="font-extrabold text-stone-900">{dataset.title}</h3>
+                  <h3 className="font-extrabold text-stone-900">{invoice.productName}</h3>
                   <p className="text-sm text-stone-400 mt-0.5">Expires in 7 days · Secure link</p>
                   <span className="mt-1.5 inline-flex items-center gap-1 rounded-full bg-amber-100 px-2 py-0.5 text-xs font-bold text-amber-700">
                     <Clock size={10} /> Active
@@ -203,10 +276,33 @@ function OverviewPage() {
                 </div>
               </div>
               <div className="flex gap-2">
-                <button className="flex items-center gap-2 rounded-xl bg-stone-900 px-4 py-2.5 text-sm font-bold text-white hover:bg-orange-600 transition-all">
+                <button 
+                  onClick={() => {
+                    const link = invoice.product?.link;
+                    if (link) {
+                      window.open(link, '_blank');
+                    } else {
+                      invoiceService.downloadInvoice(invoice._id, `Invoice_${invoice._id.slice(-6)}.pdf`);
+                    }
+                  }}
+                  className="flex items-center gap-2 rounded-xl bg-stone-900 px-4 py-2.5 text-sm font-bold text-white hover:bg-orange-600 transition-all"
+                >
                   <Download size={15} /> Download
                 </button>
-                <button className="rounded-xl border-2 border-orange-200 bg-white px-4 py-2.5 text-sm font-bold text-orange-700 hover:bg-orange-50 transition-all">Copy Link</button>
+                <button 
+                  onClick={() => {
+                    const link = invoice.product?.link;
+                    if (link) {
+                      navigator.clipboard.writeText(link);
+                      toast.success('Link copied to clipboard!');
+                    } else {
+                      toast.info('No external link available for this dataset');
+                    }
+                  }}
+                  className="rounded-xl border-2 border-orange-200 bg-white px-4 py-2.5 text-sm font-bold text-orange-700 hover:bg-orange-50 transition-all"
+                >
+                  Copy Link
+                </button>
               </div>
             </motion.div>
           ))}
@@ -227,25 +323,37 @@ function OverviewPage() {
               </tr>
             </thead>
             <tbody className="divide-y divide-orange-50">
-              {purchasedDatasets.map((dataset, idx) => (
-                <tr key={idx} className="hover:bg-orange-50/50 transition-colors">
-                  <td className="px-6 py-4 font-extrabold text-stone-900">#ORD-00{idx + 1}</td>
-                  <td className="px-6 py-4 text-stone-600 font-medium">{dataset.title}</td>
-                  <td className="px-6 py-4 text-stone-500">Mar 0{idx + 5}, 2026</td>
-                  <td className="px-6 py-4 font-extrabold text-orange-600">₹{dataset.price}</td>
+              {invoices.map((invoice, idx) => (
+                <tr key={invoice._id} className="hover:bg-orange-50/50 transition-colors">
+                  <td className="px-6 py-4 font-extrabold text-stone-900">#ORD-{invoice._id.slice(-6).toUpperCase()}</td>
+                  <td className="px-6 py-4 text-stone-600 font-medium">{invoice.productName}</td>
+                  <td className="px-6 py-4 text-stone-500">{new Date(invoice.createdAt).toLocaleDateString()}</td>
+                  <td className="px-6 py-4 font-extrabold text-orange-600">₹{invoice.amount}</td>
                   <td className="px-6 py-4">
-                    <span className="inline-flex items-center gap-1 rounded-full bg-emerald-100 px-3 py-1 text-xs font-bold text-emerald-700">
-                      <CheckCircle2 size={11} /> Completed
+                    <span className={`inline-flex items-center gap-1 rounded-full px-3 py-1 text-xs font-bold 
+                      ${invoice.status === 'paid' ? 'bg-emerald-100 text-emerald-700' : 
+                        invoice.status === 'canceled' ? 'bg-rose-100 text-rose-700' : 'bg-stone-100 text-stone-700'}`}>
+                      {invoice.status === 'paid' && <CheckCircle2 size={11} />}
+                      {invoice.status.charAt(0).toUpperCase() + invoice.status.slice(1)}
                     </span>
                   </td>
-                  <td className="px-6 py-4">
-                    <button 
-                      onClick={() => downloadInvoice(dataset)}
-                      className="flex items-center gap-1.5 text-xs font-bold text-orange-600 hover:text-orange-700 transition-colors"
-                    >
-                      <Download size={14} />
-                      Download PDF
-                    </button>
+                  <td className="px-6 py-4 space-x-3">
+                    {invoice.status === 'paid' && (
+                      <div className="flex gap-3">
+                        <button 
+                          onClick={() => invoiceService.downloadInvoice(invoice._id, `Invoice_${invoice._id.slice(-6)}.pdf`)}
+                          className="flex items-center gap-1.5 text-xs font-bold text-orange-600 hover:text-orange-700 transition-colors"
+                        >
+                          <Download size={14} /> PDF
+                        </button>
+                        <button 
+                          onClick={() => handleCancelInvoice(invoice._id)}
+                          className="flex items-center gap-1.5 text-xs font-bold text-rose-600 hover:text-rose-700 transition-colors"
+                        >
+                          Cancel
+                        </button>
+                      </div>
+                    )}
                   </td>
                 </tr>
               ))}
@@ -259,7 +367,7 @@ function OverviewPage() {
 
 // ── My Purchases ───────────────────────────────────────────────────────────────
 function PurchasesPage() {
-  const { purchasedDatasets } = useDashboardData();
+  const { invoices } = useDashboardData();
   return (
     <>
       <div className="mb-6">
@@ -267,8 +375,8 @@ function PurchasesPage() {
         <p className="text-stone-500 mt-1">All your purchased datasets — download anytime.</p>
       </div>
       <div className="space-y-4">
-        {purchasedDatasets.map((dataset, idx) => (
-          <motion.div key={dataset.id} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: idx * 0.1 }}
+        {invoices.filter(i => i.status === 'paid').map((invoice, idx) => (
+          <motion.div key={invoice._id} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: idx * 0.1 }}
             className="flex flex-col items-center justify-between gap-4 rounded-2xl border-2 border-orange-100 bg-white p-6 shadow-sm hover:border-orange-200 transition-all sm:flex-row"
           >
             <div className="flex items-center gap-4">
@@ -276,14 +384,17 @@ function PurchasesPage() {
                 <ShoppingBag size={22} className="text-white" />
               </div>
               <div>
-                <h3 className="font-extrabold text-stone-900">{dataset.title}</h3>
-                <p className="text-sm text-stone-400 mt-0.5">{dataset.contactCount.toLocaleString()} Records · ₹{dataset.price}</p>
+                <h3 className="font-extrabold text-stone-900">{invoice.productName}</h3>
+                <p className="text-sm text-stone-400 mt-0.5">Qty: {invoice.quantity} · ₹{invoice.amount}</p>
                 <span className="mt-1.5 inline-flex items-center gap-1 rounded-full bg-emerald-100 px-2 py-0.5 text-xs font-bold text-emerald-700">
                   <CheckCircle2 size={10} /> Verified
                 </span>
               </div>
             </div>
-            <button className="flex items-center gap-2 rounded-xl bg-orange-50 border border-orange-200 px-4 py-2 text-sm font-bold text-orange-700 hover:bg-orange-100 transition-all">
+            <button 
+              onClick={() => invoiceService.downloadInvoice(invoice._id, `Invoice_${invoice._id.slice(-6)}.pdf`)}
+              className="flex items-center gap-2 rounded-xl bg-orange-50 border border-orange-200 px-4 py-2 text-sm font-bold text-orange-700 hover:bg-orange-100 transition-all"
+            >
               <Download size={15} /> Download
             </button>
           </motion.div>
@@ -295,7 +406,7 @@ function PurchasesPage() {
 
 // ── Downloads ─────────────────────────────────────────────────────────────────
 function DownloadsPage() {
-  const { purchasedDatasets } = useDashboardData();
+  const { invoices } = useDashboardData();
   return (
     <>
       <div className="mb-6">
@@ -303,8 +414,8 @@ function DownloadsPage() {
         <p className="text-stone-500 mt-1">Secure download links valid for 7 days.</p>
       </div>
       <div className="space-y-4">
-        {purchasedDatasets.map((dataset, idx) => (
-          <motion.div key={dataset.id} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: idx * 0.1 }}
+        {invoices.filter(i => i.status === 'paid').map((invoice, idx) => (
+          <motion.div key={invoice._id} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: idx * 0.1 }}
             className="flex flex-col items-center justify-between gap-4 rounded-2xl border-2 border-orange-100 bg-white p-6 shadow-sm hover:border-orange-200 transition-all sm:flex-row"
           >
             <div className="flex items-center gap-4">
@@ -312,7 +423,7 @@ function DownloadsPage() {
                 <Download size={22} className="text-white" />
               </div>
               <div>
-                <h3 className="font-extrabold text-stone-900">{dataset.title}</h3>
+                <h3 className="font-extrabold text-stone-900">{invoice.productName}</h3>
                 <p className="text-sm text-stone-400 mt-0.5">Expires in 7 days · Excel &amp; CSV</p>
                 <span className="mt-1.5 inline-flex items-center gap-1 rounded-full bg-amber-100 px-2 py-0.5 text-xs font-bold text-amber-700">
                   <Clock size={10} /> Active
@@ -320,10 +431,35 @@ function DownloadsPage() {
               </div>
             </div>
             <div className="flex gap-2">
-              <button className="flex items-center gap-2 rounded-xl bg-stone-900 px-4 py-2.5 text-sm font-bold text-white hover:bg-orange-600 transition-all">
+              <button 
+                onClick={async () => {
+                  try {
+                    const link = invoice.product?.link;
+                    if (link) {
+                      window.open(link, '_blank');
+                    } else {
+                      await invoiceService.downloadInvoice(invoice._id, `Invoice_${invoice._id.slice(-6)}.pdf`);
+                    }
+                  } catch (error) {
+                    toast.error('Failed to process download.');
+                  }
+                }}
+                className="flex items-center gap-2 rounded-xl bg-stone-900 px-4 py-2.5 text-sm font-bold text-white hover:bg-orange-600 transition-all"
+              >
                 <Download size={15} /> Download
               </button>
-              <button className="rounded-xl border-2 border-orange-200 bg-white px-4 py-2.5 text-sm font-bold text-orange-700 hover:bg-orange-50 transition-all">
+              <button 
+                onClick={() => {
+                  const link = invoice.product?.link;
+                  if (link) {
+                    navigator.clipboard.writeText(link);
+                    toast.success('Link copied to clipboard!');
+                  } else {
+                    toast.info('No external link available for this dataset');
+                  }
+                }}
+                className="rounded-xl border-2 border-orange-200 bg-white px-4 py-2.5 text-sm font-bold text-orange-700 hover:bg-orange-50 transition-all"
+              >
                 Copy Link
               </button>
             </div>
