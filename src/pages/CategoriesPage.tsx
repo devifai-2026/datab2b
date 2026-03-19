@@ -324,7 +324,7 @@ export default function CategoriesPage() {
                     <IconComponent size={28} />
                   </div>
                   <span className={`text-xs font-bold px-3 py-1.5 rounded-full border ${palette.badge}`}>
-                    {category.datasetCount}+ Datasets
+                    {category.datasetCount || 0}{category.datasetCount > 0 ? '+' : ''} Datasets
                   </span>
                 </div>
 
@@ -336,16 +336,12 @@ export default function CategoriesPage() {
                   {category.name}
                 </h2>
 
-                {/* Description */}
-                <p className="mt-3 text-stone-600 leading-relaxed text-sm relative z-10">
-                  Access verified company data for <span className="font-semibold">{category.name.toLowerCase()}</span> — including contact details, revenue range, company size, and more.
-                </p>
 
                 {/* Bottom row */}
                 <div className="mt-7 flex items-center justify-between relative z-10">
                   <div className="flex items-center gap-1.5 text-xs text-stone-500 font-medium">
                     <Database size={13} className={palette.text} />
-                    <span>{category.datasetCount}+ available</span>
+                    <span>{category.datasetCount || 0}{category.datasetCount > 0 ? '+' : ''} available</span>
                   </div>
                   <Link
                     to={`/datasets?category=${category.name}`}
