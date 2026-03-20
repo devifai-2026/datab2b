@@ -6,6 +6,7 @@
 import { Link } from 'react-router-dom';
 import { Database, Twitter, Linkedin, Github, Mail, Phone, MapPin } from 'lucide-react';
 import { AiFillHeart } from 'react-icons/ai';
+import logo from '../assets/logoo.png';
 
 export default function Footer() {
   return (
@@ -22,7 +23,7 @@ export default function Footer() {
           <div className="col-span-2 md:col-span-1">
             <Link to="/" className="flex items-center gap-2.5 group mb-5">
               <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-orange-500 to-amber-500 text-white shadow-lg shadow-orange-900/50 group-hover:shadow-orange-500/50 transition-all">
-                <Database size={20} />
+                <img className='h-full w-full object-contain' src={logo} alt="Data B2B Logo" />
               </div>
               <span className="text-xl font-extrabold tracking-tight" style={{ fontFamily: 'Outfit, sans-serif' }}>
                 <span className="text-white">data</span>

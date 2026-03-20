@@ -6,6 +6,7 @@ import { RootState, AppDispatch } from '../store/store';
 import { logout, reset } from '../store/slices/authSlice';
 import { cn } from '../lib/utils';
 import { toast } from 'react-toastify';
+import logo from '../assets/logoo.png';
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = React.useState(false);
@@ -50,7 +51,7 @@ export default function Navbar() {
           <div className="flex items-center">
             <Link to="/" className="flex items-center gap-2.5 group">
               <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-orange-500 to-amber-500 text-white shadow-md shadow-orange-200 group-hover:shadow-lg group-hover:shadow-orange-300 transition-all">
-                <MdDataset size={20} />
+                <img className='h-full w-full object-contain' src={logo} alt="Data B2B Logo" />
               </div>
               <span className="text-xl font-extrabold tracking-tight" style={{ fontFamily: 'Outfit, sans-serif' }}>
                 <span className="text-stone-900">data</span>
