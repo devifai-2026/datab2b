@@ -8,6 +8,7 @@ import { RootState, AppDispatch } from '../store/store';
 import { MdEmail, MdLock, MdArrowForward, MdDataset, MdShield, MdVisibility, MdVisibilityOff } from 'react-icons/md';
 import { FaCheckCircle } from 'react-icons/fa';
 import { HiSparkles } from 'react-icons/hi2';
+import logo from '../assets/logoo.png';
 
 export default function LoginPage() {
   const [formData, setFormData] = useState({
@@ -67,8 +68,8 @@ export default function LoginPage() {
 
         <div className="relative z-10 p-10 flex-1 flex flex-col justify-center">
           <Link to="/" className="inline-flex items-center gap-2.5 mb-14">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-white/20 border border-white/30 text-white">
-              <MdDataset size={22} />
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-white/20 border border-white/30 overflow-hidden">
+              <img src={logo} className="h-full w-full object-contain p-1" alt="Logo" />
             </div>
             <span className="text-2xl font-extrabold tracking-tight text-white" style={{ fontFamily: 'Outfit, sans-serif' }}>
               data<span style={{ color: '#fed7aa' }}>.b2b</span>
@@ -117,8 +118,8 @@ export default function LoginPage() {
           {/* Mobile logo */}
           <div className="lg:hidden text-center mb-10">
             <Link to="/" className="inline-flex items-center gap-2.5">
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl text-white shadow-lg" style={{ background: 'linear-gradient(135deg, #f97316, #f59e0b)' }}>
-                <MdDataset size={22} />
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl text-white shadow-lg overflow-hidden" style={{ background: 'linear-gradient(135deg, #f97316, #f59e0b)' }}>
+                <img src={logo} className="h-full w-full object-contain p-1" alt="Logo" />
               </div>
               <span className="text-2xl font-extrabold tracking-tight text-stone-900" style={{ fontFamily: 'Outfit, sans-serif' }}>
                 data<span className="gradient-text">.b2b</span>
