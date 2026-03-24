@@ -18,8 +18,9 @@ import invoiceService from '../services/invoiceService';
 import { jsPDF } from 'jspdf';
 import { io } from 'socket.io-client';
 import Swal from 'sweetalert2';
+import { BASE_URL } from '../services/axiosInstance';
 
-const socket = io('http://localhost:5000');
+const socket = io(BASE_URL);
 
 // Shared state for the dashboard data
 const useDashboardData = () => {
@@ -287,7 +288,7 @@ function OverviewPage() {
                   }}
                   className="flex items-center gap-2 rounded-xl bg-stone-900 px-4 py-2.5 text-sm font-bold text-white hover:bg-orange-600 transition-all"
                 >
-                  <Download size={15} /> Download
+                  <Download size={15} /> Download Invoice
                 </button>
                 <button 
                   onClick={() => {
@@ -391,12 +392,28 @@ function PurchasesPage() {
                 </span>
               </div>
             </div>
-            <button 
-              onClick={() => invoiceService.downloadInvoice(invoice._id, `Invoice_${invoice._id.slice(-6)}.pdf`)}
-              className="flex items-center gap-2 rounded-xl bg-orange-50 border border-orange-200 px-4 py-2 text-sm font-bold text-orange-700 hover:bg-orange-100 transition-all"
-            >
-              <Download size={15} /> Download
-            </button>
+            <div className="flex gap-2">
+              <button 
+                onClick={() => invoiceService.downloadInvoice(invoice._id, `Invoice_${invoice._id.slice(-6)}.pdf`)}
+                className="flex items-center gap-2 rounded-xl bg-stone-900 px-4 py-2 text-sm font-bold text-white hover:bg-orange-600 transition-all"
+              >
+                <Download size={15} /> Download Invoice
+              </button>
+              <button 
+                onClick={() => {
+                  const link = invoice.product?.link;
+                  if (link) {
+                    navigator.clipboard.writeText(link);
+                    toast.success('Link copied to clipboard!');
+                  } else {
+                    toast.info('No external link available for this dataset');
+                  }
+                }}
+                className="flex items-center gap-2 rounded-xl border-2 border-orange-200 bg-white px-4 py-2 text-sm font-bold text-orange-700 hover:bg-orange-50 transition-all"
+              >
+                <LinkIcon size={15} /> Copy Link
+              </button>
+            </div>
           </motion.div>
         ))}
       </div>
@@ -446,7 +463,7 @@ function DownloadsPage() {
                 }}
                 className="flex items-center gap-2 rounded-xl bg-stone-900 px-4 py-2.5 text-sm font-bold text-white hover:bg-orange-600 transition-all"
               >
-                <Download size={15} /> Download
+                <Download size={15} /> Download Invoice
               </button>
               <button 
                 onClick={() => {

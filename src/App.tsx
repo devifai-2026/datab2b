@@ -23,6 +23,7 @@ import PrivacyPolicyPage from './pages/PrivacyPolicyPage';
 import TermsPage from './pages/TermsPage';
 import RefundPolicyPage from './pages/RefundPolicyPage';
 import ContactPage from './pages/ContactPage';
+import ProtectedRoute from './components/ProtectedRoute';
 import { useEffect } from 'react';
 
 // Scroll to top on route change
@@ -51,13 +52,13 @@ function AppContent() {
           <Route path="/" element={<LandingPage />} />
           <Route path="/categories" element={<CategoriesPage />} />
           <Route path="/datasets" element={<MarketplacePage />} />
-          <Route path="/datasets/:id" element={<DatasetDetailPage />} />
-          <Route path="/checkout/:id" element={<CheckoutPage />} />
+          <Route path="/datasets/:id" element={<ProtectedRoute><DatasetDetailPage /></ProtectedRoute>} />
+          <Route path="/checkout/:id" element={<ProtectedRoute><CheckoutPage /></ProtectedRoute>} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
           <Route path="/forgot-password" element={<ForgotPasswordPage />} />
           <Route path="/reset-password" element={<ResetPasswordPage />} />
-          <Route path="/dashboard/*" element={<DashboardPage />} />
+          <Route path="/dashboard/*" element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} />
           <Route path="/about" element={<AboutPage />} />
           <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
           <Route path="/terms" element={<TermsPage />} />

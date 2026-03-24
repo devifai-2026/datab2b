@@ -1,10 +1,8 @@
-import axios from 'axios';
-
-const API_URL = 'http://localhost:5000/api/auth';
+import axiosInstance from './axiosInstance';
 
 // Register user
 const register = async (userData: any) => {
-  const response = await axios.post(API_URL + '/register', userData);
+  const response = await axiosInstance.post('/auth/register', userData);
 
   if (response.data) {
     localStorage.setItem('user', JSON.stringify(response.data));
@@ -15,7 +13,7 @@ const register = async (userData: any) => {
 
 // Login user
 const login = async (userData: any) => {
-  const response = await axios.post(API_URL + '/login', userData);
+  const response = await axiosInstance.post('/auth/login', userData);
 
   if (response.data) {
     localStorage.setItem('user', JSON.stringify(response.data));
@@ -31,19 +29,19 @@ const logout = () => {
 
 // Forgot password
 const forgotPassword = async (email: string) => {
-  const response = await axios.post(API_URL + '/forgot-password', { email });
+  const response = await axiosInstance.post('/auth/forgot-password', { email });
   return response.data;
 };
 
 // Verify OTP
 const verifyOTP = async (email: string, otp: string) => {
-  const response = await axios.post(API_URL + '/verify-otp', { email, otp });
+  const response = await axiosInstance.post('/auth/verify-otp', { email, otp });
   return response.data;
 };
 
 // Reset password
 const resetPassword = async (userData: any) => {
-  const response = await axios.post(API_URL + '/reset-password', userData);
+  const response = await axiosInstance.post('/auth/reset-password', userData);
   return response.data;
 };
 
@@ -56,7 +54,7 @@ const updateProfile = async (userData: any) => {
     },
   };
 
-  const response = await axios.put(API_URL + '/profile', userData, config);
+  const response = await axiosInstance.put('/auth/profile', userData, config);
 
   if (response.data) {
     // Maintain token if it wasn't returned or keep the old one

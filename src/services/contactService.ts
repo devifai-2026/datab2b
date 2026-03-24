@@ -1,6 +1,4 @@
-import axios from 'axios';
-
-const API_URL = 'http://localhost:5000/api/contact';
+import axiosInstance from './axiosInstance';
 
 interface ContactData {
   firstName: string;
@@ -11,7 +9,7 @@ interface ContactData {
 }
 
 const sendInquiry = async (contactData: ContactData) => {
-  const response = await axios.post(API_URL, contactData);
+  const response = await axiosInstance.post('/contact', contactData);
   return response.data;
 };
 

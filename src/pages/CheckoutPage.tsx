@@ -343,17 +343,6 @@ export default function CheckoutPage() {
                   </div>
                 </label>
 
-                {/* Supported methods */}
-                <div className="rounded-2xl bg-stone-50 border border-stone-100 p-4">
-                  <p className="text-xs text-stone-500 font-medium mb-3">Accepted payment methods</p>
-                  <div className="flex flex-wrap gap-2">
-                    {['UPI', 'Net Banking', 'Credit Card', 'Debit Card', 'EMI'].map((method) => (
-                      <span key={method} className="rounded-lg border border-stone-200 bg-white px-3 py-1 text-xs font-semibold text-stone-600">
-                        {method}
-                      </span>
-                    ))}
-                  </div>
-                </div>
 
                 {/* Pay button */}
                 <button

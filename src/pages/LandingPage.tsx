@@ -4,7 +4,7 @@
  */
 
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'motion/react';
 import {
   ArrowRight, CheckCircle2, Star, Zap, ShieldCheck, Download,
@@ -56,6 +56,17 @@ const heroSlides = [
 function HeroCarousel() {
   const [current, setCurrent] = React.useState(0);
   const [direction, setDirection] = React.useState(1);
+  const [searchQuery, setSearchQuery] = React.useState('');
+  const navigate = useNavigate();
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      navigate(`/datasets?search=${encodeURIComponent(searchQuery.trim())}`);
+    } else {
+      navigate('/datasets');
+    }
+  };
 
   React.useEffect(() => {
     const timer = setInterval(() => {
@@ -142,7 +153,7 @@ function HeroCarousel() {
               transition={{ delay: 0.4 }}
               className="mt-10 w-full max-w-2xl"
             >
-              <div className="relative">
+              <form onSubmit={handleSearch} className="relative">
                 <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-5">
                   <svg className="h-5 w-5 text-orange-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -150,16 +161,18 @@ function HeroCarousel() {
                 </div>
                 <input
                   type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder="Search industry, city, company type..."
-                  className="block w-full rounded-2xl border-2 border-orange-100 bg-white/90 py-5 pl-14 pr-40 text-base shadow-xl outline-none focus:border-orange-400 focus:ring-4 focus:ring-orange-100 transition-all"
+                  className="block w-full rounded-2xl border-2 border-orange-100 bg-white/90 py-5 pl-14 pr-40 text-base shadow-xl outline-none focus:border-orange-400 focus:ring-4 focus:ring-orange-100 transition-all font-medium text-stone-700"
                 />
-                <Link
-                  to="/datasets"
+                <button
+                  type="submit"
                   className="absolute right-2 top-1/2 -translate-y-1/2 btn-orange px-6 py-3 text-sm font-bold rounded-xl"
                 >
                   Search
-                </Link>
-              </div>
+                </button>
+              </form>
             </motion.div>
 
             {/* CTA Buttons */}

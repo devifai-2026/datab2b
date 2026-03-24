@@ -1,6 +1,4 @@
-import axios from 'axios';
-
-const API_URL = 'http://localhost:5000/api/categories/';
+import axiosInstance from './axiosInstance';
 
 // Transform backend category to match frontend Category interface
 const transformCategory = (item: any) => ({
@@ -12,31 +10,31 @@ const transformCategory = (item: any) => ({
 
 // Get all categories
 const getCategories = async () => {
-  const response = await axios.get(API_URL);
+  const response = await axiosInstance.get('/categories/');
   return response.data.map(transformCategory);
 };
 
 // Create a category
 const createCategory = async (categoryData: { name: string; description: string }) => {
-  const response = await axios.post(API_URL, categoryData);
+  const response = await axiosInstance.post('/categories/', categoryData);
   return transformCategory(response.data);
 };
 
 // Get single category by ID
 const getCategoryById = async (id: string) => {
-  const response = await axios.get(API_URL + id);
+  const response = await axiosInstance.get(`/categories/${id}`);
   return transformCategory(response.data);
 };
 
 // Update a category
 const updateCategory = async (id: string, categoryData: { name?: string; description?: string }) => {
-  const response = await axios.put(API_URL + id, categoryData);
+  const response = await axiosInstance.put(`/categories/${id}`, categoryData);
   return transformCategory(response.data);
 };
 
 // Delete a category
 const deleteCategory = async (id: string) => {
-  const response = await axios.delete(API_URL + id);
+  const response = await axiosInstance.delete(`/categories/${id}`);
   return response.data;
 };
 

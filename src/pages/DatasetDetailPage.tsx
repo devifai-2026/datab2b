@@ -15,11 +15,6 @@ export default function DatasetDetailPage() {
   const { id } = useParams();
   const [dataset, setDataset] = React.useState<any>(null);
   const [isLoading, setIsLoading] = React.useState(true);
-  const sampleRef = React.useRef<HTMLDivElement>(null);
-
-  const scrollToSample = () => {
-    sampleRef.current?.scrollIntoView({ behavior: 'smooth' });
-  };
 
   React.useEffect(() => {
     const fetchDataset = async () => {
@@ -110,7 +105,6 @@ export default function DatasetDetailPage() {
                   { icon: Users, label: 'Contacts', value: dataset.contactCount.toLocaleString(), color: 'text-orange-600', bg: 'bg-orange-50', border: 'border-orange-100' },
                   { icon: ShieldCheck, label: 'Accuracy', value: '95%+', color: 'text-emerald-600', bg: 'bg-emerald-50', border: 'border-emerald-100' },
                   { icon: FileSpreadsheet, label: 'Format', value: 'Excel/CSV', color: 'text-blue-600', bg: 'bg-blue-50', border: 'border-blue-100' },
-                  { icon: MapPin, label: 'Location', value: dataset.location, color: 'text-purple-600', bg: 'bg-purple-50', border: 'border-purple-100' },
                 ].map((stat) => (
                   <div key={stat.label} className={`flex items-center gap-3 rounded-2xl border-2 ${stat.border} ${stat.bg} p-4`}>
                     <div className={`flex h-9 w-9 items-center justify-center rounded-xl bg-white shadow-sm ${stat.color}`}>
@@ -151,68 +145,6 @@ export default function DatasetDetailPage() {
               </div>
             </motion.div>
 
-            {/* Sample Preview */}
-            <motion.div
-              ref={sampleRef}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.2 }}
-              className="rounded-3xl border-2 border-orange-100 bg-white/90 p-8 shadow-sm overflow-hidden"
-            >
-              <div className="flex items-center justify-between mb-6">
-                <div className="flex items-center gap-3">
-                  <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-blue-500 to-indigo-500 text-white">
-                    <FileSpreadsheet size={18} />
-                  </div>
-                  <h2 className="text-xl font-bold text-stone-900">Sample Preview</h2>
-                </div>
-                <span className="rounded-full bg-amber-100 px-3 py-1 text-xs font-bold text-amber-700 border border-amber-200">
-                  🔒 Blurred Preview
-                </span>
-              </div>
-              <div className="overflow-x-auto rounded-2xl border-2 border-orange-100">
-                <table className="w-full text-left text-sm">
-                  <thead>
-                    <tr className="bg-gradient-to-r from-orange-50 to-amber-50 border-b-2 border-orange-100">
-                      {dataset.fields.map((field) => (
-                        <th key={field} className="px-4 py-3 font-bold text-stone-900 text-xs uppercase tracking-wider whitespace-nowrap">
-                          {field}
-                        </th>
-                      ))}
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {dataset.sampleData && dataset.sampleData.length > 0 ? (
-                      dataset.sampleData.map((row: any, rIdx: number) => (
-                        <tr key={rIdx} className="border-b border-orange-50 last:border-0 hover:bg-orange-50/30 transition-colors">
-                          {Object.values(row).map((val: any, cIdx: number) => {
-                            const displayVal = (typeof val === 'object' && val !== null) ? JSON.stringify(val) : val;
-                            return (
-                              <td key={cIdx} className="px-4 py-3 text-sm text-stone-600 font-medium whitespace-nowrap overflow-hidden text-ellipsis max-w-[200px]">
-                                {rIdx > 0 ? <span className="blur-[3px] select-none">{displayVal}</span> : displayVal}
-                              </td>
-                            );
-                          })}
-                        </tr>
-                      ))
-                    ) : (
-                      [1, 2, 3].map((row) => (
-                        <tr key={row} className="border-b border-orange-50 last:border-0 hover:bg-orange-50/30 transition-colors">
-                          {dataset.fields.map((field: string) => (
-                            <td key={field} className="px-4 py-3">
-                              <div className="h-4 w-20 animate-pulse rounded-lg bg-gradient-to-r from-orange-100 to-amber-100" />
-                            </td>
-                          ))}
-                        </tr>
-                      ))
-                    )}
-                  </tbody>
-                </table>
-              </div>
-              <p className="mt-4 text-center text-xs text-stone-400 italic">
-                Purchase the dataset to unlock all {dataset.contactCount.toLocaleString()} records and view full details.
-              </p>
-            </motion.div>
           </div>
 
           {/* Purchase Sidebar */}
@@ -256,12 +188,6 @@ export default function DatasetDetailPage() {
                     Download/Preview Link
                   </a>
                 )}
-                <button 
-                  onClick={scrollToSample}
-                  className="w-full rounded-2xl border-2 border-orange-200 bg-orange-50 py-4 text-base font-bold text-orange-700 transition-all hover:bg-orange-100 hover:border-orange-300"
-                >
-                  Preview Sample
-                </button>
               </div>
 
               {/* Trust features */}
@@ -270,7 +196,6 @@ export default function DatasetDetailPage() {
                   { icon: Download, label: 'Instant CSV/Excel Download', color: 'text-orange-500' },
                   { icon: ShieldCheck, label: '100% Secure Payment via Razorpay', color: 'text-emerald-500' },
                   { icon: Tag, label: 'Lifetime Access to this version', color: 'text-blue-500' },
-                  { icon: Users, label: `${dataset.contactCount.toLocaleString()} verified contacts`, color: 'text-purple-500' },
                 ].map((item) => (
                   <div key={item.label} className="flex items-center gap-3 text-sm">
                     <div className={`flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-lg bg-stone-50 ${item.color}`}>

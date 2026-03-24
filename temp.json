@@ -1,0 +1,39 @@
+[
+  {
+    "_id": "69bbcf8103d3ee41c67bc608",
+    "name": "mcc",
+    "createdAt": "2026-03-19T10:27:13.466Z",
+    "updatedAt": "2026-03-19T10:27:13.466Z",
+    "__v": 0,
+    "id": "69bbcf8103d3ee41c67bc608",
+    "datasetCount": 1
+  },
+  {
+    "_id": "69b956c0b97aa9c441cfbff7",
+    "name": "v",
+    "createdAt": "2026-03-17T13:27:28.672Z",
+    "updatedAt": "2026-03-17T13:27:34.760Z",
+    "__v": 0,
+    "id": "69b956c0b97aa9c441cfbff7",
+    "datasetCount": 3
+  },
+  {
+    "_id": "69b90a06f84d9099c84461af",
+    "name": "hello12",
+    "createdAt": "2026-03-17T08:00:06.397Z",
+    "updatedAt": "2026-03-17T08:07:06.740Z",
+    "__v": 0,
+    "id": "69b90a06f84d9099c84461af",
+    "datasetCount": 2
+  },
+  {
+    "_id": "69b8f9946a157e54f2ee74cc",
+    "name": "hii",
+    "description": "Category for hii",
+    "createdAt": "2026-03-17T06:49:56.859Z",
+    "updatedAt": "2026-03-17T06:49:56.859Z",
+    "__v": 0,
+    "id": "69b8f9946a157e54f2ee74cc",
+    "datasetCount": 4
+  }
+]

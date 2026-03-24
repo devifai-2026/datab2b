@@ -1,9 +1,7 @@
-import axios from 'axios';
-
-const API_URL = 'http://localhost:5000/api/payment';
+import axiosInstance from './axiosInstance';
 
 const createOrder = async (amount: number, currency: string = 'INR') => {
-  const response = await axios.post(`${API_URL}/order`, { amount, currency });
+  const response = await axiosInstance.post('/payment/order', { amount, currency });
   return response.data;
 };
 
@@ -25,7 +23,7 @@ const verifyPayment = async (paymentData: {
     },
   };
 
-  const response = await axios.post(`${API_URL}/verify`, paymentData, config);
+  const response = await axiosInstance.post('/payment/verify', paymentData, config);
   return response.data;
 };
 

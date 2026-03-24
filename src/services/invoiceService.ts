@@ -1,6 +1,4 @@
-import axios from 'axios';
-
-const API_URL = 'http://localhost:5000/api/invoices';
+import axiosInstance from './axiosInstance';
 
 const getMyInvoices = async () => {
   const user = JSON.parse(localStorage.getItem('user') || '{}');
@@ -9,7 +7,7 @@ const getMyInvoices = async () => {
       Authorization: `Bearer ${user.token}`,
     },
   };
-  const response = await axios.get(`${API_URL}/my`, config);
+  const response = await axiosInstance.get('/invoices/my', config);
   return response.data;
 };
 
@@ -20,7 +18,7 @@ const cancelInvoice = async (invoiceId: string) => {
       Authorization: `Bearer ${user.token}`,
     },
   };
-  const response = await axios.put(`${API_URL}/${invoiceId}/cancel`, {}, config);
+  const response = await axiosInstance.put(`/invoices/${invoiceId}/cancel`, {}, config);
   return response.data;
 };
 
@@ -32,7 +30,7 @@ const downloadInvoice = async (invoiceId: string, fileName: string = 'invoice.pd
     },
     responseType: 'blob' as const,
   };
-  const response = await axios.get(`${API_URL}/${invoiceId}/download`, config);
+  const response = await axiosInstance.get(`/invoices/${invoiceId}/download`, config);
   
   // Create a local URL for the blob and trigger download
   const url = window.URL.createObjectURL(new Blob([response.data]));

@@ -26,8 +26,9 @@ const SORT_OPTIONS = ['Popularity', 'Newest', 'Price: Low to High', 'Price: High
 export default function MarketplacePage() {
   const [searchParams] = useSearchParams();
   const initialCategory = searchParams.get('category');
+  const initialSearch = searchParams.get('search') || '';
   
-  const [searchQuery, setSearchQuery] = React.useState('');
+  const [searchQuery, setSearchQuery] = React.useState(initialSearch);
   const [filters, setFilters] = React.useState<FilterState>({
     categories: initialCategory ? [initialCategory] : [],
     locations: [],
@@ -41,8 +42,16 @@ export default function MarketplacePage() {
 
   React.useEffect(() => {
     const fetchDatasets = async () => {
+      setIsLoading(true);
       try {
-        const data = await dataService.getAllData();
+        const params: any = {};
+        if (filters.categories.length > 0) {
+          params.categories = filters.categories.join(',');
+        }
+        if (searchQuery.trim().length > 0) {
+          params.search = searchQuery.trim();
+        }
+        const data = await dataService.getAllData(params);
         setDatasets(data as any[]);
       } catch (error) {
         console.error('Error fetching datasets:', error);
@@ -50,18 +59,17 @@ export default function MarketplacePage() {
         setIsLoading(false);
       }
     };
-    fetchDatasets();
-  }, []);
+
+    // Debounce the call to prevent hitting the backend on every single keystroke.
+    const delayDebounceFn = setTimeout(() => {
+      fetchDatasets();
+    }, 400);
+
+    return () => clearTimeout(delayDebounceFn);
+  }, [filters.categories, searchQuery]);
 
   const filteredDatasets = React.useMemo(() => {
     let results = (datasets || []).filter((d) => {
-      // Search query
-      const q = searchQuery.toLowerCase();
-      if (q && !d.title.toLowerCase().includes(q) && !d.industry.toLowerCase().includes(q) && !d.location.toLowerCase().includes(q)) {
-        return false;
-      }
-      // Category filter
-      if (filters.categories.length > 0 && !filters.categories.includes(d.industry)) return false;
       // Location filter
       if (filters.locations.length > 0 && !filters.locations.includes(d.location)) return false;
       // Price filter
@@ -122,7 +130,7 @@ export default function MarketplacePage() {
               <p className="text-stone-600 ml-13">Browse and discover high-quality verified B2B databases.</p>
             </div>
             <div className="w-full max-w-md">
-              <SearchBar onSearch={setSearchQuery} />
+              <SearchBar onSearch={setSearchQuery} initialValue={initialSearch} />
             </div>
           </motion.div>
         </div>
