@@ -15,10 +15,10 @@ import dataService from '../services/dataService';
 import { Dataset } from '../types';
 
 const PRICE_RANGES: Record<string, [number, number]> = {
-  'Under ₹1000': [0, 999],
-  '₹1000 - ₹2000': [1000, 2000],
-  '₹2000 - ₹5000': [2001, 5000],
-  'Above ₹5000': [5001, Infinity],
+  'Under ₹1000 (Incl. GST)': [0, 999],
+  '₹1000 - ₹2000 (Incl. GST)': [1000, 2000],
+  '₹2000 - ₹5000 (Incl. GST)': [2001, 5000],
+  'Above ₹5000 (Incl. GST)': [5001, Infinity],
 };
 
 const SORT_OPTIONS = ['Popularity', 'Newest', 'Price: Low to High', 'Price: High to Low'];

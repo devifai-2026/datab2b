@@ -1,25 +1,20 @@
-/**
- * @license
- * SPDX-License-Identifier: Apache-2.0
- */
-
 import React from 'react';
-import { motion } from 'motion/react';
-import { Mail, Phone, MapPin, Send, MessageSquare } from 'lucide-react';
+import { motion, AnimatePresence } from 'motion/react';
+import { Mail, Phone, MapPin, Send, MessageSquare, CheckCircle2, ArrowRight, ShieldCheck, Globe, Clock } from 'lucide-react';
 import { toast } from 'react-toastify';
 import contactService from '../services/contactService';
 
 export default function ContactPage() {
   const [isSubmitting, setIsSubmitting] = React.useState(false);
+  const [isSuccess, setIsSuccess] = React.useState(false);
   const [formData, setFormData] = React.useState({
     firstName: '',
     lastName: '',
     email: '',
-    service: 'B2B Technology Data',
     message: ''
   });
 
-  const { firstName, lastName, email, service, message } = formData;
+  const { firstName, lastName, email, message } = formData;
 
   const onChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     setFormData((prev) => ({
@@ -34,14 +29,15 @@ export default function ContactPage() {
     
     try {
       await contactService.sendInquiry(formData);
-      toast.success("Message sent successfully! We'll get back to you soon.");
+      setIsSuccess(true);
+      toast.success("Message sent successfully!");
       setFormData({
         firstName: '',
         lastName: '',
         email: '',
-        service: 'B2B Technology Data',
         message: ''
       });
+      setTimeout(() => setIsSuccess(false), 5000);
     } catch (error) {
       console.error('Submission Error:', error);
       toast.error("Failed to send message. Please try again later.");
@@ -51,190 +47,244 @@ export default function ContactPage() {
   };
 
   return (
-    <div className="min-h-screen bg-warm py-20 px-4">
-      {/* Background blobs */}
-      <div className="fixed inset-0 -z-10 pointer-events-none">
-        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-orange-100/30 rounded-full blur-3xl animate-pulse" />
-        <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-amber-100/20 rounded-full blur-3xl" />
-      </div>
-
-      <div className="mx-auto max-w-6xl">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          className="text-center mb-16"
-        >
-          <span className="inline-flex items-center gap-2 rounded-full bg-orange-100 border border-orange-200 px-4 py-1.5 text-sm font-bold text-orange-700 mb-4 uppercase tracking-[0.2em] shadow-sm">
-            <MessageSquare size={14} className="text-orange-500" /> Get in Touch
-          </span>
-          <h1 className="text-6xl font-extrabold text-stone-900 mb-6 leading-tight" style={{ fontFamily: 'Outfit, sans-serif' }}>
-            Let's Start a <span className="gradient-text">Conversation</span>
-          </h1>
-          <p className="text-stone-500 text-xl max-w-2xl mx-auto font-medium">
-            Have questions about our data? Need a custom dataset? Our experts are here to help you scale your operations.
-          </p>
-        </motion.div>
-
-        <div className="grid grid-cols-1 lg:grid-cols-5 gap-10 items-start">
-          {/* Contact Info Card */}
-          <motion.div
-            initial={{ opacity: 0, x: -30 }}
+    <div className="min-h-screen bg-[#faf9f6] selection:bg-orange-200 py-24 px-4 overflow-hidden relative">
+      {/* Dynamic Background Elements */}
+      <div className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_top_right,_var(--tw-gradient-stops))] from-orange-50/50 via-transparent to-transparent" />
+      <div className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_bottom_left,_var(--tw-gradient-stops))] from-amber-50/40 via-transparent to-transparent" />
+      
+      <div className="max-w-7xl mx-auto relative z-10">
+        <div className="flex flex-col lg:flex-row gap-16 lg:items-stretch">
+          
+          {/* Left Column: Vision & Contact Info */}
+          <motion.div 
+            initial={{ opacity: 0, x: -40 }}
             animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.6, delay: 0.2 }}
-            className="lg:col-span-2 space-y-6"
+            transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+            className="lg:w-2/5 flex flex-col justify-between"
           >
-            <div className="rounded-3xl border-2 border-orange-100 bg-white/80 backdrop-blur-sm p-10 shadow-xl relative overflow-hidden group">
-              <div className="absolute top-0 right-0 w-32 h-32 bg-orange-50 rounded-full -mr-16 -mt-16 group-hover:scale-110 transition-transform duration-700" />
+            <div>
+              <motion.div
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.5 }}
+                className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white border border-stone-200 shadow-sm mb-6"
+              >
+                <div className="h-2 w-2 rounded-full bg-orange-500 animate-pulse" />
+                <span className="text-[10px] font-black text-stone-600 uppercase tracking-widest">Connect with our data experts</span>
+              </motion.div>
+
+              <h1 className="text-6xl md:text-7xl font-extrabold text-[#1a1a1a] leading-[1.05] tracking-tight mb-8">
+                Build your <br />
+                <span className="relative">
+                  <span className="z-10 relative">future</span>
+                  <motion.span 
+                    initial={{ scaleX: 0 }}
+                    animate={{ scaleX: 1 }}
+                    transition={{ delay: 0.6, duration: 0.8 }}
+                    className="absolute bottom-2 left-0 w-full h-4 bg-orange-100 -z-0 origin-left" 
+                  />
+                </span> with <br />
+                <span className="text-orange-500">precision data.</span>
+              </h1>
               
-              <h2 className="text-3xl font-extrabold text-stone-900 mb-8 relative z-10">Contact Information</h2>
-              
-              <div className="space-y-8 relative z-10">
-                <div className="flex items-start gap-5">
-                  <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-2xl bg-orange-500 shadow-lg shadow-orange-200">
-                    <Mail size={22} className="text-white" />
-                  </div>
-                  <div>
-                    <h4 className="font-bold text-stone-900 text-lg">Email Us</h4>
-                    <p className="text-stone-500 mt-1">support@datab2b.com</p>
-                    <p className="text-stone-500 text-xs font-semibold mt-1 text-orange-600">Response within 4 hours</p>
-                  </div>
-                </div>
+              <p className="text-xl text-stone-500 font-medium leading-relaxed max-w-md mb-12">
+                Have a complex requirement? Our specialized teams are ready to craft a tailor-made data ecosystem for your business growth.
+              </p>
 
-                <div className="flex items-start gap-5">
-                  <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-2xl bg-stone-900 shadow-lg shadow-stone-200">
-                    <Phone size={22} className="text-white" />
-                  </div>
-                  <div>
-                    <h4 className="font-bold text-stone-900 text-lg">Call Support</h4>
-                    <p className="text-stone-500 mt-1">+91 98765 43210</p>
-                    <p className="text-stone-500 text-xs font-semibold mt-1">Mon-Sat, 10am-7pm IST</p>
-                  </div>
-                </div>
-
-                <div className="flex items-start gap-5">
-                  <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-2xl bg-orange-100">
-                    <MapPin size={22} className="text-orange-600" />
-                  </div>
-                  <div>
-                    <h4 className="font-bold text-stone-900 text-lg">Visit Office</h4>
-                    <p className="text-stone-500 mt-1 text-sm leading-relaxed">
-                      123 Business Hub, Sector V,<br />
-                      Salt Lake, Kolkata, 700091<br />
-                      West Bengal, India
-                    </p>
-                  </div>
-                </div>
-              </div>
-
-              {/* Social Links */}
-              <div className="mt-12 flex gap-4">
-                {[1,2,3].map(i => (
-                  <div key={i} className="h-10 w-10 rounded-full bg-stone-100 hover:bg-orange-500 hover:text-white transition-all cursor-pointer flex items-center justify-center" />
+              <div className="space-y-6">
+                {[
+                  { icon: Mail, title: "Global Reach", detail: "support@datab2b.com", color: "bg-orange-500" },
+                  { icon: Phone, title: "Phone Enquiries", detail: "+91 98765 43210", color: "bg-stone-900" },
+                  { icon: Clock, title: "Support Timings", detail: "Mon - Sat, 10:00 - 19:00 IST", color: "bg-orange-100", textColor: "text-orange-700" }
+                ].map((item, idx) => (
+                  <motion.div 
+                    key={idx}
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.8 + (idx * 0.1) }}
+                    className="group flex items-center gap-5 p-4 rounded-3xl hover:bg-white hover:shadow-xl hover:shadow-stone-200/50 transition-all duration-500 border border-transparent hover:border-stone-100"
+                  >
+                    <div className={`h-14 w-14 flex items-center justify-center rounded-2xl ${item.color} shadow-lg transition-transform group-hover:scale-110 duration-500`}>
+                      <item.icon size={22} className={item.textColor || "text-white"} />
+                    </div>
+                    <div>
+                      <p className="text-xs font-bold text-stone-400 uppercase tracking-widest">{item.title}</p>
+                      <p className="text-lg font-bold text-stone-800">{item.detail}</p>
+                    </div>
+                  </motion.div>
                 ))}
               </div>
             </div>
 
-            <div className="rounded-3xl bg-stone-900 p-8 text-white">
-              <h3 className="text-xl font-bold mb-3 italic">"The data provided by Datab2b helped us double our outreach in just 3 months."</h3>
-              <p className="text-orange-400 font-bold">— Marketing Director, TechCorp</p>
-            </div>
+            <motion.div 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 1.2 }}
+              className="mt-16 flex items-center gap-6"
+            >
+              <div className="flex -space-x-4">
+                {[1,2,3,4].map(i => (
+                  <div key={i} className="h-12 w-12 rounded-full border-4 border-white bg-stone-200 overflow-hidden">
+                    <img src={`https://i.pravatar.cc/150?u=${i+10}`} alt="Expert" className="h-full w-full object-cover" />
+                  </div>
+                ))}
+                <div className="h-12 w-12 rounded-full border-4 border-white bg-orange-500 flex items-center justify-center text-white text-xs font-bold">
+                  +25
+                </div>
+              </div>
+              <p className="text-sm font-medium text-stone-500">
+                <span className="text-stone-900 font-bold italic">Top rated</span> data strategists <br />on standby to assist you.
+              </p>
+            </motion.div>
           </motion.div>
 
-          {/* Contact Form */}
+          {/* Right Column: Contact Form Card */}
           <motion.div
-            initial={{ opacity: 0, x: 30 }}
+            initial={{ opacity: 0, x: 40 }}
             animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.6, delay: 0.2 }}
-            className="lg:col-span-3 h-full"
+            transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+            className="lg:w-3/5"
           >
-            <form onSubmit={handleSubmit} className="rounded-3xl border-2 border-orange-100 bg-white p-10 md:p-12 shadow-2xl space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                  <label className="block text-xs font-bold text-stone-500 uppercase tracking-widest mb-2">First Name</label>
-                  <input
-                    required
-                    type="text"
-                    name="firstName"
-                    value={firstName}
-                    onChange={onChange}
-                    className="w-full bg-stone-50 border-2 border-stone-100 rounded-2xl px-5 py-4 focus:ring-4 focus:ring-orange-100 focus:border-orange-500 transition-all outline-none font-medium text-stone-900"
-                    placeholder="John"
-                  />
+            <div className="h-full relative group">
+              {/* Outer Glow Effect */}
+              <div className="absolute -inset-1 bg-gradient-to-r from-orange-400 to-amber-300 rounded-[40px] blur-2xl opacity-10 group-hover:opacity-20 transition duration-1000 group-hover:duration-200" />
+              
+              <div className="relative h-full bg-white border border-stone-100 rounded-[40px] shadow-[0_32px_64px_-16px_rgba(0,0,0,0.06)] p-8 md:p-14 overflow-hidden">
+                
+                {/* Visual Accent */}
+                <div className="absolute top-0 right-0 w-32 h-32 bg-orange-50/50 rounded-bl-[100px] -mr-4 -mt-4 transition-transform duration-1000 group-hover:scale-125" />
+
+                <div className="mb-10">
+                  <h2 className="text-3xl font-black text-stone-900 mb-3 tracking-tight">Tell us about your project</h2>
+                  <p className="text-stone-500 font-medium">Complete the form below and we'll link you with the right specialist.</p>
                 </div>
-                <div>
-                  <label className="block text-xs font-bold text-stone-500 uppercase tracking-widest mb-2">Last Name</label>
-                  <input
-                    required
-                    type="text"
-                    name="lastName"
-                    value={lastName}
-                    onChange={onChange}
-                    className="w-full bg-stone-50 border-2 border-stone-100 rounded-2xl px-5 py-4 focus:ring-4 focus:ring-orange-100 focus:border-orange-500 transition-all outline-none font-medium text-stone-900"
-                    placeholder="Doe"
-                  />
+
+                <form onSubmit={handleSubmit} className="space-y-8">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div className="space-y-2">
+                      <label className="text-[11px] font-black text-stone-400 uppercase tracking-widest px-1">First Name</label>
+                      <input
+                        required
+                        type="text"
+                        name="firstName"
+                        value={firstName}
+                        onChange={onChange}
+                        placeholder="e.g. Robert"
+                        className="w-full bg-stone-50 border-2 border-stone-50 hover:border-orange-100 focus:border-orange-500/50 focus:bg-white rounded-2xl px-6 py-4.5 transition-all outline-none font-semibold text-stone-900 placeholder:text-stone-300 shadow-inner"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-[11px] font-black text-stone-400 uppercase tracking-widest px-1">Last Name</label>
+                      <input
+                        required
+                        type="text"
+                        name="lastName"
+                        value={lastName}
+                        onChange={onChange}
+                        placeholder="e.g. Fox"
+                        className="w-full bg-stone-50 border-2 border-stone-50 hover:border-orange-100 focus:border-orange-500/50 focus:bg-white rounded-2xl px-6 py-4.5 transition-all outline-none font-semibold text-stone-900 placeholder:text-stone-300 shadow-inner"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <label className="text-[11px] font-black text-stone-400 uppercase tracking-widest px-1">Business Email</label>
+                    <div className="relative group/input">
+                      <Mail className="absolute left-6 top-1/2 -translate-y-1/2 text-stone-400 group-focus-within/input:text-orange-500 transition-colors" size={18} />
+                      <input
+                        required
+                        type="email"
+                        name="email"
+                        value={email}
+                        onChange={onChange}
+                        placeholder="robert@pioneer-tech.com"
+                        className="w-full bg-stone-50 border-2 border-stone-50 hover:border-orange-100 focus:border-orange-500/50 focus:bg-white rounded-2xl pl-14 pr-6 py-4.5 transition-all outline-none font-semibold text-stone-900 placeholder:text-stone-300 shadow-inner"
+                      />
+                    </div>
+                  </div>
+
+
+                  <div className="space-y-2">
+                    <label className="text-[11px] font-black text-stone-400 uppercase tracking-widest px-1">Project Details</label>
+                    <textarea
+                      required
+                      name="message"
+                      value={message}
+                      onChange={onChange}
+                      rows={4}
+                      placeholder="Share some context about your data requirements..."
+                      className="w-full bg-stone-50 border-2 border-stone-50 hover:border-orange-100 focus:border-orange-500/50 focus:bg-white rounded-2xl px-6 py-5 transition-all outline-none font-semibold text-stone-900 resize-none placeholder:text-stone-300 shadow-inner leading-relaxed"
+                    />
+                  </div>
+
+                  <div className="pt-2 flex flex-col md:flex-row items-center gap-6">
+                    <button
+                      type="submit"
+                      disabled={isSubmitting}
+                      className="w-full md:w-auto flex-1 h-18 bg-stone-900 hover:bg-[#111] text-white rounded-2xl px-10 py-5 text-base font-black flex items-center justify-center gap-4 shadow-xl shadow-stone-200 group relative overflow-hidden transition-all duration-300 disabled:opacity-50 active:scale-[0.98]"
+                    >
+                      <AnimatePresence mode="wait">
+                        {isSubmitting ? (
+                          <motion.div 
+                            key="loader"
+                            initial={{ opacity: 0 }} 
+                            animate={{ opacity: 1 }} 
+                            exit={{ opacity: 0 }}
+                            className="flex items-center gap-3"
+                          >
+                            <div className="h-6 w-6 animate-spin rounded-full border-[3px] border-white/20 border-t-white" />
+                            <span>SENDING...</span>
+                          </motion.div>
+                        ) : isSuccess ? (
+                          <motion.div
+                            key="success"
+                            initial={{ scale: 0.5, opacity: 0 }}
+                            animate={{ scale: 1, opacity: 1 }}
+                            className="flex items-center gap-3"
+                          >
+                            <CheckCircle2 size={24} className="text-orange-400" />
+                            <span>SENT SUCCESSFULLY</span>
+                          </motion.div>
+                        ) : (
+                          <motion.div
+                            key="normal"
+                            initial={{ y: 20, opacity: 0 }}
+                            animate={{ y: 0, opacity: 1 }}
+                            exit={{ y: -20, opacity: 0 }}
+                            className="flex items-center gap-3"
+                          >
+                            <Send size={20} className="transition-transform group-hover:translate-x-1 group-hover:-translate-y-1" />
+                            <span>SEND ENQUIRY NOW</span>
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
+                    </button>
+                    
+                    <div className="flex items-center gap-3 px-2">
+                       <div className="h-10 w-10 bg-orange-50 flex items-center justify-center rounded-xl">
+                          <ShieldCheck className="text-orange-600" size={20} />
+                       </div>
+                       <div>
+                         <p className="text-[10px] font-black text-stone-400 uppercase tracking-widest leading-none mb-1">GDPR Compliant</p>
+                         <p className="text-[11px] font-bold text-stone-600">Privacy secured by 256-bit AES</p>
+                       </div>
+                    </div>
+                  </div>
+                </form>
+
+                {/* Footer Badges */}
+                <div className="mt-12 flex flex-wrap items-center gap-8 pt-8 border-t border-stone-50">
+                  <div className="flex items-center gap-2 opacity-40 hover:opacity-100 transition-opacity">
+                    <Globe size={18} className="text-stone-400" />
+                    <span className="text-[10px] font-black text-stone-800 uppercase tracking-widest">Global Ops</span>
+                  </div>
+                  <div className="flex items-center gap-2 opacity-40 hover:opacity-100 transition-opacity">
+                    <MessageSquare size={18} className="text-stone-400" />
+                    <span className="text-[10px] font-black text-stone-800 uppercase tracking-widest">24/7 Monitoring</span>
+                  </div>
                 </div>
               </div>
-
-              <div>
-                <label className="block text-xs font-bold text-stone-500 uppercase tracking-widest mb-2">Business Email</label>
-                <input
-                  required
-                  type="email"
-                  name="email"
-                  value={email}
-                  onChange={onChange}
-                  className="w-full bg-stone-50 border-2 border-stone-100 rounded-2xl px-5 py-4 focus:ring-4 focus:ring-orange-100 focus:border-orange-500 transition-all outline-none font-medium text-stone-900"
-                  placeholder="john@company.com"
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs font-bold text-stone-500 uppercase tracking-widest mb-2">Service Interest</label>
-                <select 
-                  name="service"
-                  value={service}
-                  onChange={onChange}
-                  className="w-full bg-stone-50 border-2 border-stone-100 rounded-2xl px-5 py-4 focus:ring-4 focus:ring-orange-100 focus:border-orange-500 transition-all outline-none font-medium text-stone-900 appearance-none"
-                >
-                  <option>B2B Technology Data</option>
-                  <option>Consumer Market Research</option>
-                  <option>Healthcare Datasets</option>
-                  <option>Custom Data Extraction</option>
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-xs font-bold text-stone-500 uppercase tracking-widest mb-2">Your Message</label>
-                <textarea
-                  required
-                  name="message"
-                  value={message}
-                  onChange={onChange}
-                  rows={4}
-                  className="w-full bg-stone-50 border-2 border-stone-100 rounded-2xl px-5 py-4 focus:ring-4 focus:ring-orange-100 focus:border-orange-500 transition-all outline-none font-medium text-stone-900 resize-none"
-                  placeholder="Tell us about your requirements..."
-                />
-              </div>
-
-              <button
-                type="submit"
-                disabled={isSubmitting}
-                className="w-full btn-orange rounded-2xl py-5 text-lg font-bold flex items-center justify-center gap-3 shadow-xl shadow-orange-200 group relative overflow-hidden disabled:opacity-70"
-              >
-                {isSubmitting ? (
-                  <div className="h-6 w-6 animate-spin rounded-full border-3 border-white border-t-transparent" />
-                ) : (
-                  <>
-                    <Send size={20} className="group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
-                    Send Inquiry Now
-                  </>
-                )}
-              </button>
-              <p className="text-center text-stone-400 text-xs">
-                By submitting this form, you agree to our <span className="text-orange-500 font-bold underline">Privacy Policy</span>.
-              </p>
-            </form>
+            </div>
           </motion.div>
         </div>
       </div>

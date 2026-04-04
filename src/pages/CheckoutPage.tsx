@@ -389,18 +389,21 @@ export default function CheckoutPage() {
               </div>
 
               {/* Price breakdown */}
-              <div className="pt-4 space-y-2.5">
-                <div className="flex justify-between text-sm text-stone-500">
-                  <span>Subtotal</span>
-                  <span className="font-medium text-stone-700">₹{dataset.price}</span>
+              <div className="pt-4 space-y-3">
+                <div className="flex justify-between text-sm">
+                  <span className="font-bold text-stone-500 uppercase tracking-widest text-[10px]">Subtotal (Base)</span>
+                  <span className="font-bold text-stone-900">₹{Math.round(dataset.price / 1.18)}</span>
                 </div>
-                <div className="flex justify-between text-sm text-stone-500">
-                  <span>Processing Fee</span>
-                  <span className="font-medium text-emerald-600">FREE</span>
+                <div className="flex justify-between text-sm">
+                  <span className="font-bold text-stone-500 uppercase tracking-widest text-[10px]">GST (18% / IGST)</span>
+                  <span className="font-bold text-stone-900">₹{dataset.price - Math.round(dataset.price / 1.18)}</span>
                 </div>
-                <div className="flex justify-between border-t-2 border-orange-100 pt-3 text-lg font-extrabold text-stone-900">
-                  <span>Total</span>
-                  <span className="text-orange-600">₹{dataset.price}</span>
+                <div className="flex justify-between border-t-2 border-orange-100 pt-4">
+                  <div className="flex flex-col">
+                    <span className="text-lg font-black text-stone-900">Total Price</span>
+                    <span className="text-[10px] font-black text-stone-400 uppercase tracking-widest">Inclusive of taxes</span>
+                  </div>
+                  <span className="text-2xl font-black text-orange-600">₹{dataset.price}</span>
                 </div>
               </div>
             </div>
@@ -411,7 +414,6 @@ export default function CheckoutPage() {
               {[
                 { icon: ShieldCheck, color: 'text-emerald-500 bg-emerald-50', label: '95%+ Data Accuracy', sub: 'Manually verified records' },
                 { icon: Download, color: 'text-orange-500 bg-orange-50', label: 'Instant Download', sub: 'Delivered to your email immediately' },
-                { icon: Mail, color: 'text-blue-500 bg-blue-50', label: '7-Day Refund Policy', sub: 'Risk-free purchase guarantee' },
                 { icon: Lock, color: 'text-violet-500 bg-violet-50', label: 'Secure Payment', sub: 'Powered by Razorpay' },
               ].map(({ icon: Icon, color, label, sub }) => (
                 <div key={label} className="flex items-center gap-3">

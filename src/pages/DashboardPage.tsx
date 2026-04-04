@@ -93,7 +93,7 @@ const downloadInvoice = (dataset: any) => {
   
   doc.setFontSize(16);
   doc.setTextColor(249, 115, 22);
-  doc.text(`Total Amount: INR ${dataset.price}`, 20, 115);
+  doc.text(`Total Amount: INR ${dataset.price} (Incl. 18% GST)`, 20, 115);
   
   doc.setFontSize(10);
   doc.setTextColor(150, 150, 150);
@@ -168,7 +168,7 @@ function OverviewPage() {
     { label: 'Total Purchases',  value: invoices.filter(i => i.status === 'paid').length.toString(),      icon: ShoppingBag, bg: 'bg-orange-50',  text: 'text-orange-600'  },
     { label: 'Records Unlocked', value: '50,000+', icon: Database,    bg: 'bg-violet-50',  text: 'text-violet-600'  },
     { label: 'Active Downloads', value: invoices.filter(i => i.status === 'paid').length.toString(),      icon: Download,    bg: 'bg-emerald-50', text: 'text-emerald-600' },
-    { label: 'Total Spent',      value: `₹${totalSpent.toLocaleString()}`, icon: TrendingUp,  bg: 'bg-rose-50',    text: 'text-rose-600'    },
+    { label: 'Total Spent (Incl. GST)',      value: `₹${totalSpent.toLocaleString()}`, icon: TrendingUp,  bg: 'bg-rose-50',    text: 'text-rose-600'    },
   ];
 
   return (
@@ -318,7 +318,7 @@ function OverviewPage() {
                 <th className="px-6 py-4">Order ID</th>
                 <th className="px-6 py-4">Dataset</th>
                 <th className="px-6 py-4">Date</th>
-                <th className="px-6 py-4">Amount</th>
+                <th className="px-6 py-4">Amount (Incl. GST)</th>
                 <th className="px-6 py-4">Status</th>
                 <th className="px-6 py-4">Action</th>
               </tr>

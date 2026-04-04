@@ -4,7 +4,7 @@ interface ContactData {
   firstName: string;
   lastName: string;
   email: string;
-  service: string;
+  service?: string;
   message: string;
 }
 

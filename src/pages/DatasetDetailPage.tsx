@@ -157,12 +157,14 @@ export default function DatasetDetailPage() {
             >
               {/* Price */}
               <div className="mb-6 pb-6 border-b border-orange-100">
-                <div className="text-xs font-bold text-stone-400 uppercase tracking-widest mb-1">Total Price</div>
-                <div className="flex items-baseline gap-2">
-                  <span className="text-5xl font-extrabold text-stone-900" style={{ fontFamily: 'Outfit, sans-serif' }}>
-                    ₹{dataset.price}
-                  </span>
-                  <span className="text-sm text-stone-400 font-medium">One-time</span>
+                <div className="flex flex-col">
+                  <div className="flex items-baseline gap-2">
+                    <span className="text-5xl font-extrabold text-stone-900" style={{ fontFamily: 'Outfit, sans-serif' }}>
+                      ₹{dataset.price}
+                    </span>
+                    <span className="text-sm text-stone-400 font-bold uppercase tracking-widest">Incl. GST</span>
+                  </div>
+                  <div className="text-[11px] font-bold text-stone-400 mt-1 pl-1">Base Price: ₹{Math.round(dataset.price / 1.18)} + 18% GST</div>
                 </div>
                 <div className="mt-2 flex items-center gap-1.5 text-xs text-emerald-600 font-semibold">
                   <Star size={12} fill="currentColor" className="text-amber-400" />
@@ -179,15 +181,6 @@ export default function DatasetDetailPage() {
                   <Zap size={20} />
                   Buy Now
                 </Link>
-                {dataset.link && (
-                  <a 
-                    href={dataset.link}
-                    className="flex w-full items-center justify-center gap-2 rounded-2xl border-2 border-blue-200 bg-blue-50 py-4 text-base font-bold text-blue-700 transition-all hover:bg-blue-100 hover:border-blue-300"
-                  >
-                    <FileText size={20} />
-                    Download/Preview Link
-                  </a>
-                )}
               </div>
 
               {/* Trust features */}
@@ -206,11 +199,6 @@ export default function DatasetDetailPage() {
                 ))}
               </div>
 
-              {/* Money back */}
-              <div className="mt-5 rounded-2xl bg-gradient-to-br from-emerald-50 to-green-50 border border-emerald-100 p-4 text-center">
-                <p className="text-xs font-bold text-emerald-700">🛡️ 7-Day Money Back Guarantee</p>
-                <p className="text-xs text-emerald-600 mt-1">Not satisfied? Get a full refund, no questions asked.</p>
-              </div>
             </motion.div>
           </div>
         </div>
